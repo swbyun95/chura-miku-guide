@@ -1,7 +1,8 @@
 // 츄라 미쿠 스트리트 2026 현지 가이드 데이터.
 // 출처: HANDOFF.md(2026-11-22) — 39-street.com, 공식 note, PR TIMES 제3·4탄, 피아프로 공식 블로그 정리본.
 // st(상태): ok = 공식 자료로 확인됨, todo = 미확인, est = 추정.
-// 좌표(lat, lng)는 모두 추정값이다. 지도 iframe과 지도 앱 링크는 좌표 대신 q(검색어)를 쓴다.
+// 좌표(lat, lng)는 geo: 'ok'가 아니면 추정값이다. 지도 iframe과 지도 앱 링크는 q(검색어)를 쓴다.
+// pinByCoords: true면 퍼가기 지도만 좌표로 연다(검색어로는 핀이 안 뜨는 곳).
 
 // 여행 메모와 사이트에서 바꿀 수 있는 값은 여기 한 곳에 둔다.
 const CONFIG = {
@@ -19,7 +20,8 @@ const CONFIG = {
 // 장소 14곳. tags: stamp(스탬프), ar(AR 스팟), panel(등신대 패널), menu(콜라보 메뉴), shop(굿즈 판매)
 const P = [
   { id: 'popup', name: 'POP UP SHOP', ja: '初音ミク POP UP SHOP（昌ビル1階）', area: '국제거리',
-    q: '那覇市松尾1-1-1 昌ビル', lat: 26.2148, lng: 127.6801, tags: ['stamp', 'panel', 'shop'],
+    // 주소 검색은 지도에 핀이 안 떠서 퍼가기 지도는 좌표로 연다. 좌표 = Google 지도의 'Sho Bldg'(松尾1-1-1).
+    q: '那覇市松尾1-1-1 昌ビル', lat: 26.2136189, lng: 127.6807823, geo: 'ok', pinByCoords: true, tags: ['stamp', 'panel', 'shop'],
     hours: '11/2부터 11:00~19:00', st: 'ok',
     notes: [
       { t: '주소 松尾1-1-1 昌ビル1階', st: 'ok' },
@@ -33,9 +35,14 @@ const P = [
     hours: '콜라보 11:00~21:30', st: 'ok', must: true,
     notes: [{ t: '꼭 가는 곳(사용자 결정)', st: 'ok' }] },
   { id: 'asagohan', name: '이츠데모 아사고항 본점', ja: 'いつでも朝ごはん 本店', area: '국제거리',
-    q: 'いつでも朝ごはん 本店 那覇', lat: 26.2150, lng: 127.6830, tags: ['stamp', 'menu'],
+    // 가게 이름만으로는 지점 3곳이 함께 나와 핀이 안 뜬다. 본점 주소는 공식 사이트(yapparigroup.jp/itudemogohan/) 기준.
+    q: 'いつでも朝ごはん 那覇市松尾1-3-4', lat: 26.214108, lng: 127.6823292, geo: 'ok', tags: ['stamp', 'menu'],
     hours: '콜라보는 7:00~14:00만', st: 'ok', must: true,
-    notes: [{ t: '꼭 가는 곳(사용자 결정)', st: 'ok' }, { t: '콜라보 메뉴는 오후 2시까지만', st: 'ok' }] },
+    notes: [
+      { t: '꼭 가는 곳(사용자 결정)', st: 'ok' },
+      { t: '콜라보 메뉴는 오후 2시까지만', st: 'ok' },
+      { t: '본점 주소 松尾1-3-4 2층. 다른 지점(ウエストイン店 등)과 헷갈리지 않기', st: 'ok' },
+    ] },
   { id: 'tofu', name: '찻집 슈리 두부', ja: '茶屋 首里とうふ', area: '슈리',
     q: '茶屋 首里とうふ', lat: 26.2195, lng: 127.7185, tags: ['stamp', 'ar', 'menu', 'shop'],
     hours: '콜라보 10:00~18:00', st: 'ok',
@@ -114,7 +121,7 @@ const NOTICES = [
   { t: '스탬프 대지 가격, みんさー織 명함지갑 가격은 공식 자료에 없음', st: 'todo' },
   { t: 'AR 스팟은 전단지의 QR 코드로 접속', st: 'ok' },
   { t: '그리팅 이벤트(12/12)와 여행 플랜 한정 굿즈(신청 마감)는 이번 여행 기간에 해당 없음', st: 'ok' },
-  { t: '장소 좌표(KML 핀)는 추정값. 지도 보기와 지도 앱 링크는 가게 이름으로 검색', st: 'est' },
+  { t: 'KML 핀 좌표는 POP UP SHOP·이츠데모 아사고항만 Google 지도로 확인했고 나머지는 추정값. 지도 보기와 지도 앱 링크는 가게 이름으로 검색', st: 'est' },
 ];
 
 if (typeof module !== 'undefined') module.exports = { CONFIG, P, MENU, G, PH, NOTICES };

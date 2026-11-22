@@ -13,7 +13,7 @@ function folderOf(p) {
 }
 
 function placemark(p) {
-  const lines = [p.ja, p.tags.map((t) => TAG_LABEL[t]).join(' · '), p.hours, ...p.notes.map((n) => n.t), '좌표는 추정값']
+  const lines = [p.ja, p.tags.map((t) => TAG_LABEL[t]).join(' · '), p.hours, ...p.notes.map((n) => n.t), p.geo === 'ok' ? '' : '좌표는 추정값']
     .filter(Boolean);
   return `      <Placemark>
         <name>${xml(p.name)}</name>

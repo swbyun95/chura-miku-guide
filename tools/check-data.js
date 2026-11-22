@@ -35,6 +35,7 @@ for (const p of P) {
   expect(p.lat > 26.1 && p.lat < 26.3 && p.lng > 127.6 && p.lng < 127.8, `좌표가 나하 범위 밖: ${p.id}`);
   expect(p.tags.length > 0 && p.tags.every((t) => TAGS.includes(t)), `태그 오류: ${p.id}`);
   expect(ST.includes(p.st) && p.notes.every((n) => ST.includes(n.st)), `상태값 오류: ${p.id}`);
+  expect(!p.pinByCoords || p.geo === 'ok', `좌표로 핀을 찍는 곳은 확인된 좌표(geo: 'ok')여야 함: ${p.id}`);
 }
 for (const x of [...G, ...NOTICES]) expect(ST.includes(x.st), '굿즈·안내 상태값 오류');
 for (const g of G) expect(g.price !== null || g.st === 'todo', `가격 없는 굿즈는 미확인이어야 함: ${g.ja}`);
