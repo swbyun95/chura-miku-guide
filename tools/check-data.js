@@ -2,7 +2,8 @@
 // 기준은 HANDOFF.md·chura26.html(2026-11-22)의 확인된 정보와 확정 일정 okinawa_trip_handoff.md(2026-11-23)다.
 const fs = require('fs');
 const path = require('path');
-const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS } = require('../data.js');
+const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, VOCAB_SETS, VOCAB_TABS, VOCAB,
+  NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS } = require('../data.js');
 const { buildKml } = require('./build-kml.js');
 
 const errors = [];
@@ -55,6 +56,16 @@ for (const g of ['show', 'sos', 'trouble', 'pay']) expect(PH_GROUPS[g], `회화 
 expect(Object.keys(PH_GROUPS).at(-1) === 'sos', '긴급 묶음은 잘못 누르지 않도록 맨 끝이어야 함');
 expect(EMERGENCY.some((x) => x.tel === '119') && EMERGENCY.some((x) => x.tel === '110'), '긴급 전화 119·110 누락');
 expect(EMERGENCY.every((x) => /^\+?[\d-]+$/.test(x.tel) && x.label && ST.includes(x.st)), '긴급 전화 형식 오류');
+// 단어집: 묶음마다 단어가 있고, 모든 묶음이 타일 하나에 속하며, 일정에 나오는 역이 유이레일 목록에 있다.
+for (const w of VOCAB) expect(w.ja && w.ko && w.mean && VOCAB_SETS[w.g], `단어 필드·묶음 누락: ${w.ja}`);
+const tabSets = Object.values(VOCAB_TABS).flatMap((t) => t.sets);
+for (const set of Object.keys(VOCAB_SETS)) {
+  expect(VOCAB.some((w) => w.g === set), `단어 묶음에 단어가 없음: ${set}`);
+  expect(tabSets.filter((x) => x === set).length === 1, `단어 묶음이 타일에 한 번만 있어야 함: ${set}`);
+}
+const rail = VOCAB.filter((w) => w.g === 'rail').map((w) => w.ja);
+for (const st of ['那覇空港', '旭橋', '県庁前', '牧志', '儀保', '首里']) expect(rail.includes(st), `유이레일 역 누락: ${st}`);
+expect(rail[0] === '那覇空港' && rail.at(-1) === '首里' && rail.length === 15, '유이레일 역은 나하공항~슈리 15개, 정차 순서');
 expect(JSON.stringify(CONFIG.signageHours) === '[8,12,18,20]', '전광판 시보 시각 불일치');
 
 // 미쿠 진행도: 스탬프·패널·AR 목록은 장소 태그와 같고, 노벨티는 콜라보 메뉴 3곳 + 과자 2종.

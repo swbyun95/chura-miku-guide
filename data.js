@@ -273,6 +273,97 @@ const PH = [
 ];
 
 // 일본어 낱말.
+// 단어집(사용자 공부용). 회화 탭의 '단어집'·'지명·역' 타일이 보여 준다. 외우기 모드는 읽는 법·뜻을 가린다.
+const VOCAB_SETS = {
+  rail: { label: '🚝 유이레일 역', tip: '나하공항 → 슈리 정차 순서 · ★ 일정에 나오는 역' },
+  town: { label: '🗾 지명·장소', tip: '간판·버스·지도에서 볼 한자' },
+  sign: { label: '🪧 표지판', tip: '역·가게·화장실에서 보는 글자' },
+  money: { label: '💴 돈·표', tip: '가격표·매표기' },
+  eat: { label: '🍽 음식', tip: '메뉴판·주문' },
+  body: { label: '🩹 몸·약', tip: '아플 때' },
+};
+const VOCAB_TABS = {
+  words: { icon: '📖', label: '단어집', tip: '공부용 · 외우기 모드', sets: ['sign', 'money', 'eat', 'body'] },
+  places: { icon: '🚉', label: '지명·역', tip: '역 이름·동네 이름 한자', sets: ['rail', 'town'] },
+};
+const VOCAB = [
+  { g: 'rail', ja: '那覇空港', ko: '나하쿠-코-', mean: '나하공항 (출발역)', star: true },
+  { g: 'rail', ja: '赤嶺', ko: '아카미네', mean: '아카미네역' },
+  { g: 'rail', ja: '小禄', ko: '오로쿠', mean: '오로쿠역' },
+  { g: 'rail', ja: '奥武山公園', ko: '오-노야마코-엔', mean: '오노야마 공원역' },
+  { g: 'rail', ja: '壺川', ko: '츠보가와', mean: '츠보가와역' },
+  { g: 'rail', ja: '旭橋', ko: '아사히바시', mean: '아사히바시 · 나하 버스터미널 앞', star: true },
+  { g: 'rail', ja: '県庁前', ko: '켄쵸-마에', mean: '현청 앞 · 국제거리 입구 쪽', star: true },
+  { g: 'rail', ja: '美栄橋', ko: '미에바시', mean: '미에바시역' },
+  { g: 'rail', ja: '牧志', ko: '마키시', mean: '마키시 · 국제거리 끝·공설시장 쪽', star: true },
+  { g: 'rail', ja: '安里', ko: '아사토', mean: '아사토역' },
+  { g: 'rail', ja: 'おもろまち', ko: '오모로마치', mean: '오모로마치역' },
+  { g: 'rail', ja: '古島', ko: '후루지마', mean: '후루지마역' },
+  { g: 'rail', ja: '市立病院前', ko: '시리츠뵤-인마에', mean: '시립병원 앞역' },
+  { g: 'rail', ja: '儀保', ko: '기보', mean: '기보 · 슈리 바로 전 역', star: true },
+  { g: 'rail', ja: '首里', ko: '슈리', mean: '슈리 · 슈리성 가는 역 (종점 아님, 여기서 내려요)', star: true },
+  { g: 'town', ja: '沖縄', ko: '오키나와', mean: '오키나와' },
+  { g: 'town', ja: '那覇', ko: '나하', mean: '나하 (시 이름)' },
+  { g: 'town', ja: '国際通り', ko: '코쿠사이도-리', mean: '국제거리' },
+  { g: 'town', ja: '国際線 / 国内線', ko: '코쿠사이센 / 코쿠나이센', mean: '국제선 / 국내선 (공항 터미널)' },
+  { g: 'town', ja: '那覇バスターミナル', ko: '나하 바스타-미나루', mean: '나하 버스터미널 (아사히바시역 앞)' },
+  { g: 'town', ja: '久茂地', ko: '쿠모지', mean: '쿠모지 (국제거리 서쪽 동네, 우미추라라)' },
+  { g: 'town', ja: '第一牧志公設市場', ko: '다이이치 마키시 코-세츠 이치바', mean: '제1마키시 공설시장' },
+  { g: 'town', ja: '若狭', ko: '와카사', mean: '와카사 (맥스밸류)' },
+  { g: 'town', ja: '波の上', ko: '나미노우에', mean: '나미노우에 (해변·신사)' },
+  { g: 'town', ja: '首里城', ko: '슈리죠-', mean: '슈리성' },
+  { g: 'town', ja: '守礼門', ko: '슈레이몬', mean: '슈레이몬 (슈리성 입구 문)' },
+  { g: 'town', ja: '末吉公園', ko: '스에요시코-엔', mean: '스에요시 공원' },
+  { g: 'town', ja: '瀬長島', ko: '세나가지마', mean: '세나가지마' },
+  { g: 'town', ja: '豊見城', ko: '토미구스쿠', mean: '토미구스쿠 (세나가지마가 있는 시)' },
+  { g: 'sign', ja: '出口 / 入口', ko: '데구치 / 이리구치', mean: '출구 / 입구' },
+  { g: 'sign', ja: '改札口', ko: '카이사츠구치', mean: '개찰구' },
+  { g: 'sign', ja: '乗り場', ko: '노리바', mean: '타는 곳 (버스·택시)' },
+  { g: 'sign', ja: '精算', ko: '세-산', mean: '정산 (요금 모자랄 때)' },
+  { g: 'sign', ja: 'お手洗い', ko: '오테아라이', mean: '화장실' },
+  { g: 'sign', ja: '男 / 女', ko: '오토코 / 온나', mean: '남 / 여' },
+  { g: 'sign', ja: '営業中', ko: '에-교-츄-', mean: '영업 중' },
+  { g: 'sign', ja: '準備中', ko: '쥼비츄-', mean: '준비 중 (아직 안 열었거나 쉬는 시간)' },
+  { g: 'sign', ja: '定休日', ko: '테-큐-비', mean: '정기 휴일' },
+  { g: 'sign', ja: '臨時休業', ko: '린지 큐-교-', mean: '임시 휴업' },
+  { g: 'sign', ja: '売り切れ', ko: '우리키레', mean: '품절' },
+  { g: 'sign', ja: '最後尾', ko: '사이코-비', mean: '줄 맨 끝 (여기 서세요)' },
+  { g: 'sign', ja: '整理券', ko: '세-리켄', mean: '번호표 (버스 탈 때 뽑는 표도 이 이름)' },
+  { g: 'sign', ja: '押す / 引く', ko: '오스 / 히쿠', mean: '밀다 / 당기다 (문)' },
+  { g: 'sign', ja: '撮影禁止', ko: '사츠에-킨시', mean: '촬영 금지' },
+  { g: 'sign', ja: '立入禁止', ko: '타치이리킨시', mean: '출입 금지' },
+  { g: 'money', ja: '税込 / 税抜', ko: '제-코미 / 제-누키', mean: '세금 포함 / 세금 별도' },
+  { g: 'money', ja: '割引', ko: '와리비키', mean: '할인' },
+  { g: 'money', ja: '現金のみ', ko: '겡킨노미', mean: '현금만' },
+  { g: 'money', ja: 'お会計', ko: '오카이케-', mean: '계산' },
+  { g: 'money', ja: 'お釣り', ko: '오츠리', mean: '거스름돈' },
+  { g: 'money', ja: '両替', ko: '료-가에', mean: '환전 · 잔돈 바꾸기 (버스 요금함)' },
+  { g: 'money', ja: '大人 / 小児', ko: '오토나 / 쇼-니', mean: '어른 / 어린이 (표)' },
+  { g: 'money', ja: '片道 / 往復', ko: '카타미치 / 오-후쿠', mean: '편도 / 왕복' },
+  { g: 'money', ja: '切符', ko: '킵푸', mean: '표' },
+  { g: 'money', ja: '一日乗車券', ko: '이치니치 죠-샤켄', mean: '1일 승차권' },
+  { g: 'eat', ja: '注文', ko: '츄-몬', mean: '주문' },
+  { g: 'eat', ja: '食券', ko: '숏켄', mean: '식권' },
+  { g: 'eat', ja: 'おすすめ', ko: '오스스메', mean: '추천' },
+  { g: 'eat', ja: '並 / 大盛り', ko: '나미 / 오-모리', mean: '보통 / 곱빼기' },
+  { g: 'eat', ja: '店内 / 持ち帰り', ko: '텐나이 / 모치카에리', mean: '먹고 가기 / 포장' },
+  { g: 'eat', ja: 'お冷', ko: '오히야', mean: '찬물 (보통 무료)' },
+  { g: 'eat', ja: '辛い', ko: '카라이', mean: '맵다' },
+  { g: 'eat', ja: '牛 / 豚 / 鶏', ko: '규- / 부타 / 토리', mean: '소 / 돼지 / 닭' },
+  { g: 'eat', ja: '刺身', ko: '사시미', mean: '회' },
+  { g: 'eat', ja: '沖縄そば', ko: '오키나와 소바', mean: '오키나와 소바' },
+  { g: 'eat', ja: 'ゴーヤー', ko: '고-야-', mean: '여주 (쓴 오이)' },
+  { g: 'eat', ja: '泡盛', ko: '아와모리', mean: '오키나와 소주' },
+  { g: 'body', ja: '痛い', ko: '이타이', mean: '아프다' },
+  { g: 'body', ja: '熱', ko: '네츠', mean: '열' },
+  { g: 'body', ja: '頭 / お腹', ko: '아타마 / 오나카', mean: '머리 / 배' },
+  { g: 'body', ja: '薬 / 薬局', ko: '쿠스리 / 약쿄쿠', mean: '약 / 약국' },
+  { g: 'body', ja: '病院', ko: '뵤-인', mean: '병원' },
+  { g: 'body', ja: '救急', ko: '큐-큐-', mean: '응급' },
+  { g: 'body', ja: '交番 / 警察', ko: '코-반 / 케-사츠', mean: '파출소 / 경찰' },
+  { g: 'body', ja: 'アレルギー', ko: '아레루기-', mean: '알레르기' },
+];
+
 const WORDS = '台紙(다이시) 대지 · 押す(오스) 찍다 · 交換(코-칸) 교환 · 限定(겐테이) 한정';
 
 // 확인 필요·참고 사항.
@@ -490,5 +581,6 @@ const CHECKS = [
 ];
 
 if (typeof module !== 'undefined') {
-  module.exports = { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, WORDS, NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS };
+  module.exports = { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, VOCAB_SETS, VOCAB_TABS, VOCAB,
+    WORDS, NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS };
 }

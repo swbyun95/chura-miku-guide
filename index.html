@@ -139,6 +139,18 @@
     .copy { position: absolute; right: 12px; top: 12px; }
     .phrase.show { border-color: var(--teal2); background: linear-gradient(180deg, #fff, var(--teal-soft)); }
     .phrase.show .pja { font-size: 22px; }
+    .vrow { display: grid; grid-template-columns: minmax(92px, auto) 1fr; gap: 0 12px; padding: 9px 2px; border-bottom: 1px solid var(--line);
+      align-items: center; }
+    .vrow:last-child { border-bottom: 0; }
+    .vrow b { font-size: 20px; line-height: 1.3; grid-row: span 2; }
+    .vrow b small { color: var(--muted); font-size: 11px; font-weight: 400; margin-right: 4px; }
+    .vrow .vk { color: var(--teal); font-size: 14px; }
+    .vrow .vm { color: var(--muted); font-size: 13px; }
+    /* 외우기 모드: 읽는 법·뜻을 회색 칸으로 가리고, 누른 줄만 펼친다. */
+    .vbar { display: flex; align-items: center; gap: 8px; margin: 14px 2px 0; }
+    .vquiz .vrow:not(.open) .vk, .vquiz .vrow:not(.open) .vm { color: transparent; background: var(--line); border-radius: 6px; }
+    .vquiz .vrow:not(.open) .vk { margin-bottom: 3px; }
+    .vrow.star { background: var(--teal-soft); margin: 0 -8px; padding-left: 10px; padding-right: 10px; border-radius: 10px; }
     .ph-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 2px 0 6px; }
     .ph-tiles button { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 7px 2px 6px; font-size: 11px;
       line-height: 1.25; word-break: keep-all; }
@@ -259,7 +271,7 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=8"></script>
+  <script src="data.js?v=9"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -476,10 +488,29 @@
       const cards = PH.map((ph, i) => (ph.g === g ? phCard(ph, i) : '')).join('');
       return `<h3 class="ph-sec">${v.icon} ${v.label}<span>${esc(v.tip)}</span></h3>${g === 'sos' ? emergencyHtml() : ''}${cards}`;
     }
+    // 단어 줄. 역은 정차 순번을 붙인다.
+    const vRow = (w, i, n) => `<div class="vrow ${w.star ? 'star' : ''}" data-vw="${i}"><b lang="ja">${n ? `<small>${n}</small>` : ''}`
+      + `${esc(w.ja)}</b><span class="vk">${w.star ? '★ ' : ''}${esc(w.ko)}</span><span class="vm">${esc(w.mean)}</span></div>`;
+    function vocabSection(set) {
+      const v = VOCAB_SETS[set];
+      let n = 0;
+      const rows = VOCAB.map((w, i) => (w.g === set ? vRow(w, i, set === 'rail' ? ++n : 0) : '')).join('');
+      return `<h3 class="ph-sec">${v.label}<span>${esc(v.tip)}</span></h3><div class="card">${rows}</div>`;
+    }
+    // 단어집은 사용자 공부용(2026-11-23): 외우기 모드가 기본, 이 휴대폰에 켜짐·꺼짐을 저장한다.
+    let vocabQuiz = load('chura-vocab-quiz', true);
+    const quizBar = () => `<div class="vbar"><button class="mini ${vocabQuiz ? 'fill' : ''}" data-quiz>외우기 모드 ${vocabQuiz ? '켜짐' : '꺼짐'}</button>`
+      + `<span class="small">${vocabQuiz ? '가린 칸을 누르면 읽는 법·뜻이 보여요' : '단어를 누르면 크게 보여요'}</span></div>`;
+    // 타일 순서: 전체 · 회화 묶음 · 단어집 · 지명·역 · 긴급(잘못 누르지 않도록 맨 끝).
+    const phTiles = () => [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS).filter(([k]) => k !== 'sos'),
+      ...Object.entries(VOCAB_TABS), ['sos', PH_GROUPS.sos]];
     function renderPhrases() {
-      $('#ph-groups').innerHTML = [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS)].map(([k, v]) =>
+      $('#ph-groups').innerHTML = phTiles().map(([k, v]) =>
         `<button class="${k === phGroup ? 'on' : ''} ${k === 'sos' ? 'sos' : ''}" data-g="${k}"><i>${v.icon}</i>${v.label}</button>`).join('');
-      $('#phrase-list').innerHTML = (phGroup === 'all' ? Object.keys(PH_GROUPS) : [phGroup]).map(phSection).join('');
+      const tab = VOCAB_TABS[phGroup];
+      $('#phrase-list').classList.toggle('vquiz', !!tab && vocabQuiz);
+      $('#phrase-list').innerHTML = tab ? quizBar() + tab.sets.map(vocabSection).join('')
+        : (phGroup === 'all' ? Object.keys(PH_GROUPS) : [phGroup]).map(phSection).join('');
       $('#words').textContent = WORDS;
     }
 
@@ -537,10 +568,10 @@
       window.scrollTo(0, 0);
     }
     // 문장을 화면 가득 크게 보여 준다(상대에게 그대로 보여 주는 용도).
-    let shownPh = 0;
-    function openPhrase(i) {
-      shownPh = i;
-      $('#o-ja').textContent = PH[i].ja; $('#o-ko').textContent = PH[i].ko; $('#o-mean').textContent = PH[i].mean;
+    let shown = PH[0];
+    function openPhrase(item) {
+      shown = item;
+      $('#o-ja').textContent = item.ja; $('#o-ko').textContent = item.ko; $('#o-mean').textContent = item.mean;
       $('#overlay').hidden = false;
     }
     function copyText(text) {
@@ -551,7 +582,7 @@
 
     document.addEventListener('click', (e) => {
       const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],'
-        + '[data-copy],[data-ph],[data-jump],[data-close],#o-copy');
+        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-close],#o-copy');
       if (!t) return;
       const ds = t.dataset;
       if (ds.view) show(ds.view);
@@ -567,9 +598,11 @@
       else if (ds.goph) { phGroup = ds.goph; renderPhrases(); show('v-ja'); }
       else if (ds.g) { phGroup = ds.g; renderPhrases(); }
       else if (ds.copy) copyText(PH[+ds.copy].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
-      else if (t.id === 'o-copy') copyText(PH[shownPh].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
+      else if (t.id === 'o-copy') copyText(shown.ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
       else if ('close' in ds) { if (e.target === t || e.target.closest('button')) $('#overlay').hidden = true; }
-      else if (ds.ph) openPhrase(+ds.ph);
+      else if (ds.ph) openPhrase(PH[+ds.ph]);
+      else if ('quiz' in ds) { vocabQuiz = !vocabQuiz; save('chura-vocab-quiz', vocabQuiz); renderPhrases(); }
+      else if (ds.vw) { if (vocabQuiz) t.classList.toggle('open'); else openPhrase(VOCAB[+ds.vw]); }
       else if ('jump' in ds) markNow()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
