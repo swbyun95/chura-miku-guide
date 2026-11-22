@@ -136,10 +136,30 @@
     .phrase .pja { font-size: 18px; font-weight: 600; line-height: 1.45; }
     .phrase .pko { color: var(--teal); font-size: 14px; margin-top: 2px; }
     .phrase .pmean { color: var(--muted); font-size: 13px; }
-    .phrase.big { padding-right: 14px; }
-    .phrase.big .pja { font-size: 30px; line-height: 1.4; }
-    .phrase.big .copy { position: static; margin-top: 10px; }
     .copy { position: absolute; right: 12px; top: 12px; }
+    .phrase.show { border-color: var(--teal2); background: linear-gradient(180deg, #fff, var(--teal-soft)); }
+    .phrase.show .pja { font-size: 22px; }
+    .ph-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 2px 0 6px; }
+    .ph-tiles button { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 7px 2px 6px; font-size: 11px;
+      line-height: 1.25; word-break: keep-all; }
+    .ph-tiles button i { display: block; font-style: normal; font-size: 20px; margin-bottom: 1px; }
+    .ph-tiles button.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .ph-tiles button.sos:not(.on) { background: var(--red-soft); border-color: #f3b4be; color: var(--red); font-weight: 700; }
+    .ph-sec { font-size: 16px; margin: 20px 4px 8px; }
+    .ph-sec span { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+    .sos-call { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .call { display: block; text-align: center; background: var(--red); color: #fff; border-radius: 12px; padding: 10px 6px;
+      text-decoration: none; font-weight: 800; font-size: 24px; line-height: 1.2; }
+    .call small { display: block; font-size: 12px; font-weight: 600; opacity: .92; }
+    .call.wide { grid-column: 1 / -1; background: #334155; font-size: 17px; }
+    .overlay { position: fixed; inset: 0; z-index: 30; background: #fff; display: flex; flex-direction: column; justify-content: center;
+      padding: calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom)); }
+    .overlay[hidden] { display: none; }
+    .overlay .oja { font-size: clamp(30px, 9vw, 56px); font-weight: 700; line-height: 1.35; }
+    .overlay .oko { color: var(--teal); font-size: 16px; margin-top: 18px; }
+    .overlay .omean { color: var(--muted); font-size: 15px; }
+    .overlay .row { margin-top: 22px; }
+    .overlay .mini { font-size: 15px; padding: 8px 16px; }
 
     .checks label { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
     .checks label:first-child { border-top: 0; }
@@ -196,8 +216,8 @@
     </section>
 
     <section class="view" id="v-ja">
-      <h2>회화 <span class="small">문장을 누르면 크게 · 보여 주기용</span></h2>
-      <div class="chips" id="ph-groups"></div>
+      <h2>회화 <span class="small">문장을 누르면 화면 가득 크게 보여요</span></h2>
+      <div class="ph-tiles" id="ph-groups"></div>
       <div id="phrase-list"></div>
       <p class="small" id="words"></p>
     </section>
@@ -233,9 +253,13 @@
     <button data-view="v-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.4"/></svg>정보</button>
   </nav>
   <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay" hidden data-close>
+    <div class="oja" lang="ja" id="o-ja"></div><div class="oko" id="o-ko"></div><div class="omean" id="o-mean"></div>
+    <div class="row"><button class="mini" id="o-copy">복사</button><button class="mini fill" data-close>닫기</button></div>
+  </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=4"></script>
+  <script src="data.js?v=5"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -440,12 +464,22 @@
 
     // ── 회화 ──
     let phGroup = 'all';
+    const phCard = (ph, i) => `<div class="card phrase ${ph.g === 'show' ? 'show' : ''}" data-ph="${i}">`
+      + `<div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
+      + `<div class="pmean">${esc(ph.mean)}</div><button class="mini copy" data-copy="${i}">복사</button></div>`;
+    // 긴급 전화 버튼. tel: 주소는 하이픈을 뺀다.
+    const emergencyHtml = () => `<div class="card sos-call">${EMERGENCY.map((x, i) =>
+      `<a class="call ${i === EMERGENCY.length - 1 ? 'wide' : ''}" href="tel:${x.tel.replace(/-/g, '')}">${esc(x.tel)}`
+      + `<small>${esc(x.label)}</small></a>`).join('')}</div>`;
+    function phSection(g) {
+      const v = PH_GROUPS[g];
+      const cards = PH.map((ph, i) => (ph.g === g ? phCard(ph, i) : '')).join('');
+      return `<h3 class="ph-sec">${v.icon} ${v.label}<span>${esc(v.tip)}</span></h3>${g === 'sos' ? emergencyHtml() : ''}${cards}`;
+    }
     function renderPhrases() {
-      $('#ph-groups').innerHTML = [['all', '전체'], ...Object.entries(PH_GROUPS)].map(([k, v]) =>
-        `<button class="chip ${k === phGroup ? 'on' : ''}" data-g="${k}">${v}</button>`).join('');
-      $('#phrase-list').innerHTML = PH.map((ph, i) => (phGroup === 'all' || ph.g === phGroup)
-        ? `<div class="card phrase" data-ph="${i}"><div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
-          + `<div class="pmean">${esc(ph.mean)}</div><button class="mini copy" data-copy="${i}">복사</button></div>` : '').join('');
+      $('#ph-groups').innerHTML = [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS)].map(([k, v]) =>
+        `<button class="${k === phGroup ? 'on' : ''} ${k === 'sos' ? 'sos' : ''}" data-g="${k}"><i>${v.icon}</i>${v.label}</button>`).join('');
+      $('#phrase-list').innerHTML = (phGroup === 'all' ? Object.keys(PH_GROUPS) : [phGroup]).map(phSection).join('');
       $('#words').textContent = WORDS;
     }
 
@@ -502,6 +536,13 @@
       $$('nav button').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
       window.scrollTo(0, 0);
     }
+    // 문장을 화면 가득 크게 보여 준다(상대에게 그대로 보여 주는 용도).
+    let shownPh = 0;
+    function openPhrase(i) {
+      shownPh = i;
+      $('#o-ja').textContent = PH[i].ja; $('#o-ko').textContent = PH[i].ko; $('#o-mean').textContent = PH[i].mean;
+      $('#overlay').hidden = false;
+    }
     function copyText(text) {
       if (navigator.clipboard) return navigator.clipboard.writeText(text);
       const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
@@ -509,7 +550,8 @@
     }
 
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],[data-copy],[data-ph],[data-jump]');
+      const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],'
+        + '[data-copy],[data-ph],[data-jump],[data-close],#o-copy');
       if (!t) return;
       const ds = t.dataset;
       if (ds.view) show(ds.view);
@@ -522,10 +564,12 @@
         renderTracks();
       }
       else if (ds.f) { filter = ds.f; renderFilters(); renderPlaces(); }
-      else if (ds.g) { phGroup = ds.g; renderPhrases(); }
       else if (ds.goph) { phGroup = ds.goph; renderPhrases(); show('v-ja'); }
+      else if (ds.g) { phGroup = ds.g; renderPhrases(); }
       else if (ds.copy) copyText(PH[+ds.copy].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
-      else if (ds.ph) t.classList.toggle('big');
+      else if (t.id === 'o-copy') copyText(PH[shownPh].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
+      else if ('close' in ds) { if (e.target === t || e.target.closest('button')) $('#overlay').hidden = true; }
+      else if (ds.ph) openPhrase(+ds.ph);
       else if ('jump' in ds) markNow()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 

@@ -2,7 +2,7 @@
 // 기준은 HANDOFF.md·chura26.html(2026-11-22)의 확인된 정보와 확정 일정 okinawa_trip_handoff.md(2026-11-23)다.
 const fs = require('fs');
 const path = require('path');
-const { CONFIG, P, MENU, G, GN, PH_GROUPS, PH, NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS } = require('../data.js');
+const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS } = require('../data.js');
 const { buildKml } = require('./build-kml.js');
 
 const errors = [];
@@ -46,6 +46,14 @@ for (const x of [...G, ...GN, ...NOTICES]) expect(ST.includes(x.st), '굿즈·�
 for (const s of SOURCES) expect(/^https:\/\//.test(s.url), `출처 주소 오류: ${s.name}`);
 for (const g of G) expect(g.price !== null || g.st === 'todo', `가격 없는 굿즈는 미확인이어야 함: ${g.ja}`);
 for (const ph of PH) expect(ph.ja && ph.ko && ph.mean && PH_GROUPS[ph.g], `일본어 문장 필드·상황 누락: ${ph.ja}`);
+expect(new Set(PH.map((ph) => ph.ja)).size === PH.length, '일본어 문장 중복');
+for (const [g, v] of Object.entries(PH_GROUPS)) {
+  expect(v.icon && v.label && v.tip, `회화 묶음 필드 누락: ${g}`);
+  expect(PH.some((ph) => ph.g === g), `회화 묶음에 문장이 없음: ${g}`);
+}
+for (const g of ['show', 'sos', 'trouble']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
+expect(EMERGENCY.some((x) => x.tel === '119') && EMERGENCY.some((x) => x.tel === '110'), '긴급 전화 119·110 누락');
+expect(EMERGENCY.every((x) => /^\+?[\d-]+$/.test(x.tel) && x.label && ST.includes(x.st)), '긴급 전화 형식 오류');
 expect(JSON.stringify(CONFIG.signageHours) === '[8,12,18,20]', '전광판 시보 시각 불일치');
 
 // 미쿠 진행도: 스탬프·패널·AR 목록은 장소 태그와 같고, 노벨티는 콜라보 메뉴 3곳 + 과자 2종.
