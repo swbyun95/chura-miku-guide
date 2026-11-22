@@ -37,6 +37,8 @@
     ul.notes li { margin: 3px 0; display: flex; gap: 6px; align-items: baseline; }
     .st { flex: none; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 6px; color: #fff; }
     .st.ok { background: var(--ok); } .st.todo { background: var(--todo); } .st.est { background: var(--est); }
+    .st.rev { background: #0369a1; }
+    .sources a { color: var(--teal); }
     .actions { display: flex; gap: 8px; margin-top: 10px; }
     .btn { flex: 1; text-align: center; border: 1px solid var(--teal); color: var(--teal); background: #fff; border-radius: 10px;
       padding: 9px 0; font-size: 14px; font-weight: 600; text-decoration: none; }
@@ -81,17 +83,21 @@
       <div class="card"><table id="menu-table"></table></div>
       <h2>굿즈 · 과자</h2>
       <div class="card"><table id="goods-table"></table></div>
+      <div class="card"><ul class="notes" id="goods-notes"></ul></div>
     </section>
 
     <section class="view" id="v-ja">
       <h2>일본어 <span class="small">문장을 누르면 크게 보여요</span></h2>
       <div id="phrase-list"></div>
+      <p class="small" id="words"></p>
     </section>
 
     <section class="view" id="v-notice">
       <h2>확인할 것 · 참고</h2>
       <div class="card"><ul class="notes" id="notice-list"></ul></div>
-      <p class="small">상태 표시: <span class="st ok">확인됨</span> 공식 자료 · <span class="st todo">미확인</span> 확인 필요 · <span class="st est">추정</span> AI 추정</p>
+      <p class="small">상태 표시: <span class="st ok">확인됨</span> 공식 자료 · <span class="st rev">후기</span> X·인스타 방문자 후기 ·
+        <span class="st todo">미확인</span> 확인 필요 · <span class="st est">추정</span> AI 추정</p>
+      <p class="small sources" id="sources"></p>
     </section>
   </main>
 
@@ -103,10 +109,10 @@
   </nav>
 
   <!-- data.js를 고치면 v 숫자를 올린다(휴대폰이 예전 데이터를 캐시에서 쓰지 않게). -->
-  <script src="data.js?v=2"></script>
+  <script src="data.js?v=3"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
-    const ST_LABEL = { ok: '확인됨', todo: '미확인', est: '추정' };
+    const ST_LABEL = { ok: '확인됨', rev: '후기', todo: '미확인', est: '추정' };
     const STAMP_KEY = 'chura-miku-stamps';
     const $ = (s) => document.querySelector(s);
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -114,7 +120,9 @@
     const stBadge = (st) => `<span class="st ${st}">${ST_LABEL[st]}</span>`;
     const embedQuery = (p) => (p.pinByCoords ? `${p.lat},${p.lng}` : p.q);
     const embedUrl = (p) => `https://maps.google.com/maps?q=${encodeURIComponent(embedQuery(p))}&z=${CONFIG.mapZoom}&output=embed`;
-    const appUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.q)}`;
+    // query_place_id가 있으면 Google 지도 앱이 검색 결과 대신 그 장소를 바로 연다.
+    const appUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.q)}`
+      + (p.pid ? `&query_place_id=${encodeURIComponent(p.pid)}` : '');
 
     let filter = 'all';
     const stamps = new Set(JSON.parse(localStorage.getItem(STAMP_KEY) || '[]'));
@@ -171,16 +179,21 @@
       $('#menu-table').innerHTML = MENU.map((m) =>
         `<tr><td><b>${esc(m.ja)}</b><div class="ja">${esc(m.ko)} · ${esc(placeName(m.place))}</div></td><td class="price">${yen(m.price)}</td></tr>`).join('');
       $('#goods-table').innerHTML = G.map((g) =>
-        `<tr><td><b>${esc(g.ja)}</b><div class="ja">${esc(g.ko)} · ${esc(g.note)}</div></td><td class="price">${yen(g.price)}<br>${stBadge(g.st)}</td></tr>`).join('');
+        `<tr><td><b>${esc(g.ja)}</b><div class="ja">${esc(g.ko)}</div></td>`
+        + `<td class="price">${g.each ? '각 ' : ''}${yen(g.price)}${g.st === 'ok' ? '' : '<br>' + stBadge(g.st)}</td></tr>`).join('');
+      $('#goods-notes').innerHTML = GN.map((n) => `<li>${stBadge(n.st)}<span>${esc(n.t)}</span></li>`).join('');
     }
 
     function renderPhrases() {
       $('#phrase-list').innerHTML = PH.map((ph, i) =>
         `<div class="card phrase" data-ph="${i}"><div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div><div class="pmean">${esc(ph.mean)}</div></div>`).join('');
+      $('#words').textContent = WORDS;
     }
 
     function renderNotices() {
       $('#notice-list').innerHTML = NOTICES.map((n) => `<li>${stBadge(n.st)}<span>${esc(n.t)}</span></li>`).join('');
+      $('#sources').innerHTML = '출처: ' + SOURCES.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join(' · ')
+        + '. 행사 내용은 예고 없이 바뀔 수 있어요.';
     }
 
     // 일본 시간(UTC+9) 기준 다음 전광판 시보까지 남은 시간.
@@ -225,7 +238,7 @@
       renderPlaces();
     });
 
-    $('#period').textContent = `행사 ${CONFIG.eventStart} ~ ${CONFIG.eventEnd} · 국제거리 · 슈리`;
+    $('#period').textContent = `행사 ${CONFIG.eventStart} ~ ${CONFIG.eventEnd} · 국제거리 · 슈리 · 정보 기준일 ${CONFIG.infoDate}`;
     renderFilters(); renderPlaces(); renderMyMaps(); renderFood(); renderPhrases(); renderNotices();
     renderSignage(); setInterval(renderSignage, 1000);
   </script>
