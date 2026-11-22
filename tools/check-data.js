@@ -52,6 +52,7 @@ for (const [g, v] of Object.entries(PH_GROUPS)) {
   expect(PH.some((ph) => ph.g === g), `회화 묶음에 문장이 없음: ${g}`);
 }
 for (const g of ['show', 'sos', 'trouble', 'pay']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
+expect(Object.keys(PH_GROUPS).at(-1) === 'sos', '긴급 묶음은 잘못 누르지 않도록 맨 끝이어야 함');
 expect(EMERGENCY.some((x) => x.tel === '119') && EMERGENCY.some((x) => x.tel === '110'), '긴급 전화 119·110 누락');
 expect(EMERGENCY.every((x) => /^\+?[\d-]+$/.test(x.tel) && x.label && ST.includes(x.st)), '긴급 전화 형식 오류');
 expect(JSON.stringify(CONFIG.signageHours) === '[8,12,18,20]', '전광판 시보 시각 불일치');
