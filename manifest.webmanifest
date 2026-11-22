@@ -1,0 +1,9 @@
+{
+  "name": "오키나와 2박 3일 · 츄라 미쿠 스트리트",
+  "short_name": "오키나와 미쿠",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f8",
+  "theme_color": "#0f766e",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

@@ -22,7 +22,7 @@ AR 포토 스팟용 전단지(QR)를 계산대 등에서 받기
         <name>얏파리 스테이크 3rd</name>
         <description>やっぱりステーキ 3rd 国際通りがじゅまる店（ハイサイおきなわビル2F）
 스탬프 · 콜라보 메뉴
-11:00~21:30 (L.O. 21:00)
+11:00~22:00 (L.O. 21:30)
 꼭 가는 곳(사용자 결정)
 콜라보 메뉴는 6개 매장에서 팔지만 스탬프는 이 매장에만 있음
 おきなわ屋 2층. 국제거리의 큰 빨간 「おきなわ屋」 간판과 시사상이 표시</description>
@@ -143,6 +143,138 @@ AR
 등신대 패널: 福きつね
 역 안에 세븐은행 ATM</description>
         <Point><coordinates>127.6924996,26.2173056,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>애니메이트 나하 국제거리점</name>
+        <description>アニメイト那覇国際通り店（牧志1-2-1 花ビル4F）
+등신대 패널 · 굿즈
+11:00~ (Google)
+입구에 등신대 패널 + 공식 굿즈 판매 (매장 공식 X)
+얏파리 스테이크·블루씰 근처</description>
+        <Point><coordinates>127.684959,26.21549,0</coordinates></Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>여행 장소</name>
+      <Placemark>
+        <name>나하공항 국제선 터미널</name>
+        <description>那覇空港 国際線ターミナル</description>
+        <Point><coordinates>127.6510196,26.2091348,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>나하공항 국내선 터미널</name>
+        <description>那覇空港 国内線ターミナル</description>
+        <Point><coordinates>127.651119,26.206398,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>세븐은행 ATM (국제선 1층)</name>
+        <description>セブン銀行 ATM 那覇空港 国際線ターミナル</description>
+        <Point><coordinates>127.6510196,26.2091348,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>아사히바시역</name>
+        <description>旭橋駅 ゆいレール</description>
+        <Point><coordinates>127.6754375,26.2118982,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>우미추라라 (JAドリーム館 2F)</name>
+        <description>うみちゅらら 那覇市久茂地3-2-22</description>
+        <Point><coordinates>127.6813527,26.2141516,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>블루씰 국제거리점</name>
+        <description>ブルーシール 国際通り店</description>
+        <Point><coordinates>127.6850578,26.2154368,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>나미노우에 해변</name>
+        <description>波の上ビーチ</description>
+        <Point><coordinates>127.6720664,26.2212041,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>맥스밸류 와카사 (24시간)</name>
+        <description>マックスバリュ 若狭店</description>
+        <Point><coordinates>127.6736385,26.2210294,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>츠지 슈퍼 (24시간·현금)</name>
+        <description>辻スーパー</description>
+        <Point><coordinates>127.6717665,26.2173475,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>슈리역</name>
+        <description>首里駅 ゆいレール</description>
+        <Point><coordinates>127.7255554,26.2191655,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>아지토야 슈리성점</name>
+        <description>アジトヤ 首里崎山町1-37-3</description>
+        <Point><coordinates>127.7202004,26.2155707,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>레스토랑 스이무이</name>
+        <description>レストラン首里杜</description>
+        <Point><coordinates>127.716206,26.217815,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>스에요시 공원</name>
+        <description>末吉公園 那覇市首里末吉町1-3-1</description>
+        <Point><coordinates>127.7147197,26.2275897,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>제1마키시 공설시장</name>
+        <description>第一牧志公設市場</description>
+        <Point><coordinates>127.6876,26.2141,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>사카나가쿠 (시장 2층 식당)</name>
+        <description>魚学 公設市場本店</description>
+        <Point><coordinates>127.6878976,26.2145234,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>스시로 국제거리점</name>
+        <description>スシロー 那覇市久茂地3-3-16</description>
+        <Point><coordinates>127.682442,26.214558,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>돈키호테 국제거리점</name>
+        <description>ドン・キホーテ 国際通り店</description>
+        <Point><coordinates>127.6878077,26.2158634,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>나하공항 국내선 ⑥번 버스 승강장</name>
+        <description>那覇空港 国内線 バス乗り場</description>
+        <Point><coordinates>127.6512163,26.2064787,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>瀬長島ホテル ウミカジテラス 정류장</name>
+        <description>Senagajima hotel Umikajiterrace バス停</description>
+        <Point><coordinates>127.641852,26.176453,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>해먹 카페 라 이스라</name>
+        <description>ハンモックカフェ ラ・イスラ</description>
+        <Point><coordinates>127.6404752,26.1764417,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>바이 더 쉬림프 (갈릭 새우)</name>
+        <description>by・The・Shrimp 瀬長島</description>
+        <Point><coordinates>127.6405992,26.1768958,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>오야지노 마구로 (참치 덮밥)</name>
+        <description>おやじのマグロ 瀬長島</description>
+        <Point><coordinates>127.6405235,26.1769262,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>기지무나 (타코라이스)</name>
+        <description>タコライスカフェ きじむなぁ 瀬長島</description>
+        <Point><coordinates>127.6404866,26.1765828,0</coordinates></Point>
+      </Placemark>
+      <Placemark>
+        <name>모토무즈 카레빵 (9:00~)</name>
+        <description>MOTOMU'S CURRY BREAD 瀬長島</description>
+        <Point><coordinates>127.640479,26.176882,0</coordinates></Point>
       </Placemark>
     </Folder>
   </Document>

@@ -1,8 +1,8 @@
-// data.js의 장소(P)로 Google 내 지도(My Maps)용 KML을 만든다. 실행: node tools/build-kml.js
-// 한 장소는 폴더 하나에만 넣는다(스탬프 > AR > 패널 순). 좌표는 추정값이다.
+// data.js의 장소로 Google 내 지도(My Maps)용 KML을 만든다. 실행: node tools/build-kml.js
+// 미쿠 장소(P)는 폴더 하나에만 넣는다(스탬프 > AR > 패널 순). 일정 장소(SPOTS)는 좌표가 있는 곳만 '여행 장소' 폴더에 넣는다.
 const fs = require('fs');
 const path = require('path');
-const { P } = require('../data.js');
+const { P, SPOTS } = require('../data.js');
 
 const FOLDERS = [['stamp', '스탬프'], ['ar', 'AR 스팟'], ['panel', '등신대 패널']];
 const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
@@ -22,6 +22,14 @@ function placemark(p) {
       </Placemark>`;
 }
 
+function spotmark(s) {
+  return `      <Placemark>
+        <name>${xml(s.name)}</name>
+        <description>${xml(s.q)}</description>
+        <Point><coordinates>${s.lng},${s.lat},0</coordinates></Point>
+      </Placemark>`;
+}
+
 function buildKml() {
   const folders = FOLDERS.map(([tag, label]) => `    <Folder>
       <name>${label}</name>
@@ -32,6 +40,10 @@ ${P.filter((p) => folderOf(p) === tag).map(placemark).join('\n')}
   <Document>
     <name>츄라 미쿠 스트리트 2026</name>
 ${folders}
+    <Folder>
+      <name>여행 장소</name>
+${SPOTS.filter((s) => s.lat).map(spotmark).join('\n')}
+    </Folder>
   </Document>
 </kml>
 `;
