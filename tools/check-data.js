@@ -118,4 +118,5 @@ if (errors.length) {
   console.error('실패 ' + errors.length + '건\n- ' + errors.join('\n- '));
   process.exit(1);
 }
-console.log(`통과: 미쿠 장소 ${P.length}, 일정 장소 ${SPOTS.length}, 일정 칸 ${DAYS.reduce((n, d) => n + d.steps.length, 0)}, 메뉴 ${MENU.length}, 굿즈 ${G.length}, 문장 ${PH.length}`);
+const stepCount = DAYS.reduce((n, d) => n + d.steps.length, 0);
+console.log(`통과: 미쿠 장소 ${P.length}, 일정 장소 ${SPOTS.length}, 일정 칸 ${stepCount}, 메뉴 ${MENU.length}, 굿즈 ${G.length}, 문장 ${PH.length}`);

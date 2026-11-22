@@ -73,7 +73,8 @@
       width: fit-content; margin: 3px 0 0 auto; padding: 0 5px; }
     .step.past { opacity: .5; }
     .row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .mini { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 4px 10px; font-size: 13px; text-decoration: none; color: var(--teal); font-weight: 600; }
+    .mini { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 4px 10px;
+      font-size: 13px; text-decoration: none; color: var(--teal); font-weight: 600; }
     .mini.fill { background: var(--teal); border-color: var(--teal); color: #fff; }
     .mini.ghost { color: var(--muted); font-weight: 400; }
     .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
@@ -223,8 +224,10 @@
   </main>
 
   <nav>
-    <button class="on" data-view="v-plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>일정</button>
-    <button data-view="v-miku"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>미쿠</button>
+    <button class="on" data-view="v-plan">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>일정</button>
+    <button data-view="v-miku">
+      <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>미쿠</button>
     <button data-view="v-food"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 13H6.2L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>메뉴·굿즈</button>
     <button data-view="v-ja"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>회화</button>
     <button data-view="v-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.4"/></svg>정보</button>
@@ -308,7 +311,8 @@
         .map((a) => `<a class="mini ghost" href="${appUrl(a)}" target="_blank" rel="noopener">${esc(a.name)} ↗</a>`).join('');
       const miku = (s.miku || []).map((c) => mikuChip(c, s.at)).join('');
       const tools = mapButtons(p, boxId) + (s.ph ? `<button class="mini" data-goph="${s.ph}">회화</button>` : '');
-      const homeHint = s.at === 'home' && !priv.addr && d.steps.findIndex((x) => x.at === 'home') === i ? '<div class="hint">정보 탭에 숙소 주소를 넣으면 지도 버튼이 생겨요</div>' : '';
+      const firstHome = d.steps.findIndex((x) => x.at === 'home') === i;
+      const homeHint = s.at === 'home' && !priv.addr && firstHome ? '<div class="hint">정보 탭에 숙소 주소를 넣으면 지도 버튼이 생겨요</div>' : '';
       return `<div class="step ${s.key ? 'key' : ''}" data-i="${i}">
         <div class="time">${esc(s.t)}</div>
         <div><h4>${esc(title)} ${stBadge(s.st)}</h4>
@@ -368,7 +372,8 @@
         const n = g.items.filter((it) => done.has(g.key + ':' + it[0])).length;
         const chips = g.items.map(([id, name, day]) => {
           const code = g.key + ':' + id;
-          return `<button class="mk ${done.has(code) ? 'on' : ''} ${day === '휴업' ? 'off' : ''}" data-mk="${code}">${esc(name)}<small>${esc(day)}</small></button>`;
+          const cls = `mk ${done.has(code) ? 'on' : ''} ${day === '휴업' ? 'off' : ''}`;
+          return `<button class="${cls}" data-mk="${code}">${esc(name)}<small>${esc(day)}</small></button>`;
         }).join('');
         return `<div class="track"><div class="head"><span>${g.label}</span><span>${n} / ${g.items.length}</span></div>`
           + `<div class="bar"><i style="width:${(n / g.items.length) * 100}%"></i></div><div class="row" style="margin-top:0">${chips}</div></div>`;
@@ -425,7 +430,8 @@
     function renderFood() {
       const placeName = (id) => P.find((p) => p.id === id).name;
       $('#menu-table').innerHTML = MENU.map((m) =>
-        `<tr><td><b lang="ja">${esc(m.ja)}</b><div class="ja">${esc(m.ko)} · ${esc(placeName(m.place))}</div></td><td class="price">${yen(m.price)}</td></tr>`).join('');
+        `<tr><td><b lang="ja">${esc(m.ja)}</b><div class="ja">${esc(m.ko)} · ${esc(placeName(m.place))}</div></td>`
+        + `<td class="price">${yen(m.price)}</td></tr>`).join('');
       $('#goods-table').innerHTML = G.map((g) =>
         `<tr><td><b lang="ja">${esc(g.ja)}</b><div class="ja">${esc(g.ko)}</div></td>`
         + `<td class="price">${g.each ? '각 ' : ''}${yen(g.price)}${g.st === 'ok' ? '' : '<br>' + stBadge(g.st)}</td></tr>`).join('');
@@ -449,7 +455,8 @@
       $('#priv-memo').value = priv.memo || '';
       $('#checks').innerHTML = CHECKS.map(([id, t]) =>
         `<label><input type="checkbox" data-check="${id}" ${checked.has(id) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('');
-      $('#hours').innerHTML = HOURS.map(([n, h, note]) => `<tr><td>${esc(n)}${note ? `<div class="small">${esc(note)}</div>` : ''}</td><td class="r">${esc(h)}</td></tr>`).join('');
+      $('#hours').innerHTML = HOURS.map(([n, h, note]) =>
+        `<tr><td>${esc(n)}${note ? `<div class="small">${esc(note)}</div>` : ''}</td><td class="r">${esc(h)}</td></tr>`).join('');
       $('#notice-list').innerHTML = NOTICES.map(noteLi).join('');
       $('#sources').innerHTML = '출처: ' + SOURCES.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join(' · ')
         + '. 행사 내용은 예고 없이 바뀔 수 있어요.';
@@ -468,6 +475,9 @@
       }
     }
 
+    const waitText = (m, sec) => (m < 10 ? `${m}분 ${String(sec).padStart(2, '0')}초 전`
+      : `${Math.floor(m / 60) ? Math.floor(m / 60) + '시간 ' : ''}${m % 60}분 후`);
+
     function renderHeader() {
       const now = jstNow();
       const first = DAYS[0].date;
@@ -478,7 +488,7 @@
       const hh = String(s.h).padStart(2, '0');
       const m = Math.floor(s.wait / 60), sec = s.wait % 60;
       $('#signage').innerHTML = s.live ? `📺 국제거리 전광판 미쿠 시보 <b>지금 방송 중</b> (${hh}:00)`
-        : `📺 다음 전광판 미쿠 시보 <b>${hh}:00</b> · ${m < 10 ? `${m}분 ${String(sec).padStart(2, '0')}초 전` : `${Math.floor(m / 60) ? Math.floor(m / 60) + '시간 ' : ''}${m % 60}분 후`}`;
+        : `📺 다음 전광판 미쿠 시보 <b>${hh}:00</b> · ${waitText(m, sec)}`;
     }
 
     // ── 이벤트 ──
@@ -533,7 +543,12 @@
     renderDays(); renderDay(); renderMiku(); renderFood(); renderPhrases(); renderInfo(); renderHeader();
     setInterval(renderHeader, 1000);
     let lastMin = jstNow().min;
-    setInterval(() => { const m = jstNow().min; if (m !== lastMin) { lastMin = m; renderDays(); markNow(); if ($('#bus')) $('#bus').innerHTML = busHtml(); } }, 5000);
+    setInterval(() => {
+      const m = jstNow().min;
+      if (m === lastMin) return;
+      lastMin = m; renderDays(); markNow();
+      if ($('#bus')) $('#bus').innerHTML = busHtml();
+    }, 5000);
     if (jstNow().date === DAYS[dayIdx].date) setTimeout(() => markNow()?.scrollIntoView({ block: 'center' }), 50);
 
     // 오프라인용: 한 번 열면 화면과 데이터를 휴대폰에 저장해 둔다(지도는 인터넷 필요).
