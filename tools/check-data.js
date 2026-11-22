@@ -51,7 +51,7 @@ for (const [g, v] of Object.entries(PH_GROUPS)) {
   expect(v.icon && v.label && v.tip, `회화 묶음 필드 누락: ${g}`);
   expect(PH.some((ph) => ph.g === g), `회화 묶음에 문장이 없음: ${g}`);
 }
-for (const g of ['show', 'sos', 'trouble']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
+for (const g of ['show', 'sos', 'trouble', 'pay']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
 expect(EMERGENCY.some((x) => x.tel === '119') && EMERGENCY.some((x) => x.tel === '110'), '긴급 전화 119·110 누락');
 expect(EMERGENCY.every((x) => /^\+?[\d-]+$/.test(x.tel) && x.label && ST.includes(x.st)), '긴급 전화 형식 오류');
 expect(JSON.stringify(CONFIG.signageHours) === '[8,12,18,20]', '전광판 시보 시각 불일치');
