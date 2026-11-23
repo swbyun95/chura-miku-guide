@@ -240,6 +240,11 @@
     .theme-grid button small { display: block; color: var(--muted); font-size: 10px; }
     .phrase .peasy { margin-top: 6px; font-size: 13px; color: #92400e; background: #fffbeb; border-radius: 8px; padding: 3px 8px; width: fit-content; }
     .phrase .peasy b { font-size: 15px; }
+    .phrase .pfull { margin-top: 6px; font-size: 13px; }
+    .phrase .pfull summary { color: var(--muted); cursor: pointer; width: fit-content; padding: 2px 0; }
+    .phrase .pfull .pja2 { font-size: 15px; font-weight: 600; line-height: 1.45; margin-top: 4px; }
+    .phrase .pfull .pko2 { color: var(--teal); font-size: 13px; }
+    .phrase .pfull .mini { position: static; margin-top: 4px; }
     .phrase.short .pja { font-size: 24px; font-weight: 800; }
     .cul { font-size: 14px; }
     .cul .ct { font-weight: 800; font-size: 15px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
@@ -362,8 +367,8 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=11"></script>
-  <script src="dict.js?v=11"></script>
+  <script src="data.js?v=12"></script>
+  <script src="dict.js?v=12"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -645,9 +650,21 @@
     const ALLW = [...VOCAB, ...DICT_W];
     const easyOf = (ph) => ph.easy || EASY[ph.ja];
     const easyLine = (ph) => { const e = easyOf(ph); return e ? `<div class="peasy">⚡ 짧게 <b lang="ja">${esc(e[0])}</b> ${esc(e[1])}</div>` : ''; };
-    const phCard = (ph, i) => `<div class="card phrase ${ph.g === 'show' ? 'show' : ''}" data-ph="${i}">`
-      + `<div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
-      + `<div class="pmean">${esc(ph.mean)}</div>${easyLine(ph)}<button class="mini copy" data-copy="${i}">복사</button></div>`;
+    // 짧은 말이 있으면 짧은 말을 기본으로 보여 주고, 정중한 전체 문장은 접어 둔다(사용자 요청 2026-11-24).
+    // 단, '화면 보여 주기(show)' 문장은 직원에게 그대로 보여 주는 용도라 전체 문장을 기본으로 둔다.
+    const easyFirst = (ph) => !!easyOf(ph) && ph.g !== 'show';
+    const phCard = (ph, i) => {
+      const e = easyFirst(ph) ? easyOf(ph) : null;
+      if (!e) return `<div class="card phrase ${ph.g === 'show' ? 'show' : ''}" data-ph="${i}">`
+        + `<div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
+        + `<div class="pmean">${esc(ph.mean)}</div>${easyLine(ph)}<button class="mini copy" data-copy="${i}">복사</button></div>`;
+      return `<div class="card phrase" data-ph="${i}">`
+        + `<div class="pja" lang="ja">${esc(e[0])}</div><div class="pko">${esc(e[1])}</div><div class="pmean">${esc(ph.mean)}</div>`
+        + `<details class="pfull" data-full="${i}"><summary>정중한 전체 문장 보기</summary>`
+        + `<div class="pja2" lang="ja">${esc(ph.ja)}</div><div class="pko2">${esc(ph.ko)}</div>`
+        + `<button class="mini" data-copyfull="${i}">전체 문장 복사</button></details>`
+        + `<button class="mini copy" data-copy="${i}">복사</button></div>`;
+    };
     // 짧은 말 카드: 짧은 일본어를 크게, 원래 문장 뜻을 아래에.
     const shortCard = (ph, i) => { const e = easyOf(ph); return `<div class="card phrase short" data-easy="${i}"><div class="pja" lang="ja">${esc(e[0])}</div>`
       + `<div class="pko">${esc(e[1])}</div><div class="pmean">${esc(ph.mean)}</div></div>`; };
@@ -881,8 +898,8 @@
 
     document.addEventListener('click', (e) => {
       const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],'
-        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-goto],[data-deck],[data-fc],[data-kana],[data-th],[data-easy],[data-close],#o-copy');
-      if (!t) return;
+        + '[data-copy],[data-copyfull],[data-full],[data-ph],[data-vw],[data-quiz],[data-jump],[data-goto],[data-deck],[data-fc],[data-kana],[data-th],[data-easy],[data-close],#o-copy');
+      if (!t || e.target.closest('summary')) return; // 접힌 문장 열고 닫기는 브라우저 기본 동작
       const ds = t.dataset;
       if (ds.view) show(ds.view);
       else if (ds.day) { dayIdx = +ds.day; renderDays(); renderDay(); }
@@ -898,10 +915,12 @@
       else if (ds.g) { phGroup = ds.g; phTheme = ''; setQuery(''); }
       else if (ds.th) { phTheme = phTheme === ds.th ? '' : ds.th; setQuery(''); $('#ph-q').scrollIntoView({ block: 'start' }); }
       else if (ds.easy) { const p = ALLPH[+ds.easy]; const e = easyOf(p); openPhrase({ ja: e[0], ko: e[1], mean: `${p.mean} · 원래 문장: ${p.ja}` }); }
-      else if (ds.copy) copyText(ALLPH[+ds.copy].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
+      else if (ds.copyfull) copyText(ALLPH[+ds.copyfull].ja).then(() => toast('전체 문장을 복사했어요'), () => toast('복사하지 못했어요'));
+      else if (ds.full) openPhrase(ALLPH[+ds.full]);
+      else if (ds.copy) { const p = ALLPH[+ds.copy]; copyText(easyFirst(p) ? easyOf(p)[0] : p.ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요')); }
       else if (t.id === 'o-copy') copyText(shown.ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
       else if ('close' in ds) { if (e.target === t || e.target.closest('button')) $('#overlay').hidden = true; }
-      else if (ds.ph) openPhrase(ALLPH[+ds.ph]);
+      else if (ds.ph) { const p = ALLPH[+ds.ph]; if (easyFirst(p)) { const x = easyOf(p); openPhrase({ ja: x[0], ko: x[1], mean: `${p.mean} · 정중하게: ${p.ja}` }); } else openPhrase(p); }
       else if (ds.deck) { deck = ds.deck; fillQueue(); renderPhrases(); }
       else if (ds.kana) { kanaKata = ds.kana === '1'; renderPhrases(); }
       else if (ds.fc) { studyStep(ds.fc); renderPhrases(); }
