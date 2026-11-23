@@ -53,7 +53,9 @@ for (const [g, v] of Object.entries(PH_GROUPS)) {
   expect(v.icon && v.label && v.tip, `회화 묶음 필드 누락: ${g}`);
   expect(PH.some((ph) => ph.g === g), `회화 묶음에 문장이 없음: ${g}`);
 }
-for (const g of ['show', 'sos', 'trouble', 'pay']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
+// 'show'(보여 주기) 묶음은 2026-11-24 사용자 요청으로 없앴다 — 문장을 누르면 크게 보여 주는 기능으로 충분.
+expect(!PH_GROUPS.show && !PH.some((x) => x.g === 'show'), "'보여 주기' 묶음은 없어야 함");
+for (const g of ['sos', 'trouble', 'pay']) expect(PH_GROUPS[g], `회화 묶음 누락(사용자 요청): ${g}`);
 expect(Object.keys(PH_GROUPS).at(-1) === 'sos', '긴급 묶음은 잘못 누르지 않도록 맨 끝이어야 함');
 expect(EMERGENCY.some((x) => x.tel === '119') && EMERGENCY.some((x) => x.tel === '110'), '긴급 전화 119·110 누락');
 expect(EMERGENCY.every((x) => /^\+?[\d-]+$/.test(x.tel) && x.label && ST.includes(x.st)), '긴급 전화 형식 오류');

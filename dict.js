@@ -26,7 +26,7 @@ const THEMES = {
   health: { icon: '🩹', label: '아플 때', words: ['아파', '아프', '병원', '약', '다쳤', '열이', '알레르기', '구급', '응급', '몸'], groups: ['sos'], sets: ['body'] },
   trouble: { icon: '🛟', label: '문제 해결', words: ['문제', '분실', '잃어', '길', '도움', '도와', '고장', '오류', '품절', '늦', '경찰'],
     groups: ['trouble', 'sos'], sets: [] },
-  chat: { icon: '💬', label: '인사·짧은 말', words: ['인사', '안녕', '감사', '고마', '미안', '죄송', '대화', '칭찬', '기본'], groups: ['basic', 'show'], sets: [] },
+  chat: { icon: '💬', label: '인사·짧은 말', words: ['인사', '안녕', '감사', '고마', '미안', '죄송', '대화', '칭찬', '기본'], groups: ['basic'], sets: [] },
   number: { icon: '🔢', label: '숫자·시간', words: ['숫자', '시간', '몇시', '얼마', '개수', '요일', '날짜', '돈', '엔', '세기'], groups: [], sets: ['money'] },
   okinawa: { icon: '🌺', label: '오키나와', words: ['오키나와', '방언', '시사', '류큐', '현지', '특산', '명물', '우치나'], groups: [], sets: ['town'] },
   japan: { icon: '🗾', label: '일본 매너', words: ['일본', '매너', '예절', '문화', '팁', '쓰레기', '흡연', '신발', '표지판', '간판'], groups: [], sets: ['sign'] },

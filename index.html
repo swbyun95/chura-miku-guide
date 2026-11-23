@@ -207,8 +207,6 @@
     .phrase .pko { color: var(--teal); font-size: 14px; margin-top: 2px; }
     .phrase .pmean { color: var(--muted); font-size: 13px; }
     .copy { position: absolute; right: 12px; top: 12px; }
-    .phrase.show { border-color: var(--teal2); background: linear-gradient(180deg, #fff, var(--teal-soft)); }
-    .phrase.show .pja { font-size: 22px; }
     .vrow { display: grid; grid-template-columns: minmax(92px, auto) 1fr; gap: 0 12px; padding: 9px 2px; border-bottom: 1px solid var(--line);
       align-items: center; }
     .vrow:last-child { border-bottom: 0; }
@@ -367,8 +365,8 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=15"></script>
-  <script src="dict.js?v=15"></script>
+  <script src="data.js?v=16"></script>
+  <script src="dict.js?v=16"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -651,11 +649,10 @@
     const easyOf = (ph) => ph.easy || EASY[ph.ja];
     const easyLine = (ph) => { const e = easyOf(ph); return e ? `<div class="peasy">⚡ 짧게 <b lang="ja">${esc(e[0])}</b> ${esc(e[1])}</div>` : ''; };
     // 짧은 말이 있으면 짧은 말을 기본으로 보여 주고, 정중한 전체 문장은 접어 둔다(사용자 요청 2026-11-24).
-    // 단, '화면 보여 주기(show)' 문장은 직원에게 그대로 보여 주는 용도라 전체 문장을 기본으로 둔다.
-    const easyFirst = (ph) => !!easyOf(ph) && ph.g !== 'show';
+    const easyFirst = (ph) => !!easyOf(ph);
     const phCard = (ph, i) => {
       const e = easyFirst(ph) ? easyOf(ph) : null;
-      if (!e) return `<div class="card phrase ${ph.g === 'show' ? 'show' : ''}" data-ph="${i}">`
+      if (!e) return `<div class="card phrase" data-ph="${i}">`
         + `<div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
         + `<div class="pmean">${esc(ph.mean)}</div>${easyLine(ph)}<button class="mini copy" data-copy="${i}">복사</button></div>`;
       return `<div class="card phrase" data-ph="${i}">`
