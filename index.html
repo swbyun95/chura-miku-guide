@@ -66,7 +66,67 @@
     .step h4 { margin: 0; font-size: 15px; line-height: 1.35; }
     .step .do { font-size: 14px; margin-top: 2px; }
     .step .alt { font-size: 13px; color: var(--alt); margin-top: 3px; }
-    .step .alt::before { content: '안 되면 → '; font-weight: 700; }
+    details.pb { margin-top: 6px; }
+    details.pb summary { display: inline-block; font-size: 12px; font-weight: 700; color: #b45309; background: #fff7ed; border: 1px solid #fed7aa;
+      border-radius: 999px; padding: 2px 10px; cursor: pointer; list-style: none; }
+    details.pb summary::-webkit-details-marker { display: none; }
+    details.pb summary::before { content: '🛟 안 되면 ▸'; }
+    details.pb[open] summary::before { content: '🛟 안 되면 ▾'; }
+    details.pb .alt { margin-top: 5px; padding: 6px 10px; background: #fffbeb; border-radius: 8px; color: #78350f; }
+    .step.next { box-shadow: inset 4px 0 0 #f59e0b; border-radius: 12px; }
+    .step.next .time::after { content: '다음'; display: block; font-size: 10px; color: #fff; background: #f59e0b; border-radius: 6px;
+      width: fit-content; margin: 3px 0 0 auto; padding: 0 5px; }
+    .nowcard { background: linear-gradient(135deg, var(--teal), var(--teal2)); color: #fff; border: 0; }
+    .nowcard .lbl { font-size: 11px; font-weight: 700; opacity: .85; letter-spacing: .02em; }
+    .nowcard .cur { font-size: 18px; font-weight: 800; line-height: 1.3; margin: 1px 0 2px; }
+    .nowcard .sub { font-size: 13px; opacity: .92; }
+    .nowcard .nx { margin-top: 10px; padding-top: 9px; border-top: 1px solid rgba(255, 255, 255, .25); font-size: 14px; }
+    .nowcard .nx b { font-size: 15px; }
+    .nowcard .in { display: inline-block; background: #fff; color: var(--teal); font-weight: 800; border-radius: 999px; padding: 1px 9px;
+      font-size: 13px; margin-left: 4px; }
+    .nowcard .in.soon { background: #fde68a; color: #92400e; }
+    .nowcard .pbar { height: 6px; background: rgba(255, 255, 255, .25); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+    .nowcard .pbar i { display: block; height: 100%; background: #fff; border-radius: 99px; }
+    .nowcard .ends { display: flex; justify-content: space-between; font-size: 11px; opacity: .85; margin-top: 3px; }
+    .nowcard .jump { margin-top: 10px; }
+    .glance { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; margin: 0 -2px 10px; padding: 4px 2px 2px; }
+    .glance button { flex: none; position: relative; border: 0; background: none; padding: 16px 8px 0; min-width: 64px; text-align: center; }
+    .glance button::before { content: ''; position: absolute; top: 6px; left: 0; right: 0; height: 2px; background: var(--line); }
+    .glance button::after { content: ''; position: absolute; top: 2px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%;
+      background: #fff; border: 2px solid #94a3b8; box-sizing: border-box; }
+    .glance button b { display: block; font-size: 12px; font-variant-numeric: tabular-nums; color: #334155; }
+    .glance button span { display: block; font-size: 11px; color: var(--muted); max-width: 84px; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; }
+    .glance button.past::after { background: #94a3b8; }
+    .glance button.past b, .glance button.past span { opacity: .55; }
+    .glance button.now::after { background: var(--teal2); border-color: var(--teal2); width: 14px; height: 14px; margin-left: -7px; top: 0; }
+    .glance button.now b { color: var(--teal); }
+    .glance button.next::after { border-color: #f59e0b; }
+    .glance button.next b { color: #b45309; }
+    /* 비행기 공부(오프라인) */
+    .course { counter-reset: c; }
+    .course button { display: flex; width: 100%; align-items: center; gap: 10px; text-align: left; border: 0; border-top: 1px solid var(--line);
+      background: none; padding: 10px 2px; font-size: 14px; }
+    .course button:first-child { border-top: 0; }
+    .course button i { font-style: normal; flex: none; width: 74px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .course button b { flex: 1; }
+    .course button small { color: var(--teal); font-weight: 700; }
+    .course button.on { background: var(--teal-soft); border-radius: 10px; }
+    .fc { text-align: center; padding: 22px 14px 16px; }
+    .fc .fja { font-size: 44px; font-weight: 800; line-height: 1.25; min-height: 56px; overflow-wrap: anywhere; }
+    .fc .fja.long { font-size: 26px; }
+    .fc .fko { color: var(--teal); font-size: 18px; margin-top: 10px; min-height: 24px; }
+    .fc .fmean { color: var(--muted); font-size: 14px; min-height: 20px; }
+    .fc .hide { color: transparent; background: var(--line); border-radius: 8px; }
+    .fc .cnt { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .fc .actions .btn { padding: 12px 0; }
+    .kana { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .kana span { text-align: center; border: 1px solid var(--line); border-radius: 8px; padding: 4px 0 3px; background: #fff; }
+    .kana span b { display: block; font-size: 20px; line-height: 1.2; }
+    .kana span small { color: var(--muted); font-size: 11px; }
+    .kana span.blank { border: 0; background: none; }
+    details.plan summary { font-weight: 700; font-size: 14px; cursor: pointer; }
+    details.plan p { margin: 6px 0 0; font-size: 14px; }
     .step.now { background: var(--teal-soft); border-radius: 12px; box-shadow: inset 4px 0 0 var(--teal2); border-top-color: transparent; }
     .step.now + .step { border-top-color: transparent; }
     .step.now .time::after { content: '지금'; display: block; font-size: 10px; color: #fff; background: var(--teal2); border-radius: 6px;
@@ -129,6 +189,16 @@
     .nextbus { font-size: 13px; font-weight: 700; color: var(--teal); background: var(--teal-soft); border-radius: 8px; padding: 6px 10px; margin: 8px 0 2px; }
     .leg { font-size: 14px; font-weight: 700; margin: 4px 0 2px; }
     .leg + table { margin-bottom: 12px; }
+    .bus tr.over td { color: var(--muted); text-decoration: line-through; }
+    .bus tr.over .lab { background: #64748b; text-decoration: none; display: inline-block; }
+    .rail { margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: var(--teal-soft); font-size: 13px; }
+    .rail .rh { font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+    .rail .rn { margin-top: 4px; font-weight: 800; color: var(--teal); }
+    .rail .deps { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .rail .deps span { font-variant-numeric: tabular-nums; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+    .rail .deps span.gone { opacity: .35; }
+    .rail .deps span.nx { background: var(--teal); color: #fff; border-color: var(--teal); font-weight: 800; }
+    .rail .rs { margin-top: 4px; font-size: 11px; color: var(--muted); }
     .plan b { display: block; font-size: 14px; }
     .plan p { margin: 2px 0 0; font-size: 14px; }
 
@@ -271,7 +341,7 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=9"></script>
+  <script src="data.js?v=10"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -353,21 +423,39 @@
         <div class="time">${esc(s.t)}</div>
         <div><h4>${esc(title)} ${stBadge(s.st)}</h4>
           <div class="do">${esc(s.do)}</div>
-          ${s.alt ? `<div class="alt">${esc(s.alt)}</div>` : ''}
+          ${s.alt ? `<details class="pb"><summary></summary><div class="alt">${esc(s.alt)}</div></details>` : ''}
           ${miku ? `<div class="row">${miku}</div>` : ''}
-          ${tools || alts ? `<div class="row">${tools}${alts}</div>` : ''}${homeHint}
+          ${tools || alts ? `<div class="row">${tools}${alts}</div>` : ''}${homeHint}${railBox(s, d)}
           <div class="map" id="map-${boxId}" hidden></div></div>
       </div>`;
+    }
+
+    // 유이레일: 일정 칸(날짜·시각)에 맞는 구간이 있으면 다음 열차와 남은 시간을 보여 준다. 매분 markNow가 다시 그린다.
+    const hhmm = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    const railLeg = (s, d) => RAIL.legs.findIndex((l) => l.date === d.date && l.stepT === s.t);
+    const railBox = (s, d) => { const k = railLeg(s, d); return k < 0 ? '' : `<div class="rail" data-rail="${k}">${railHtml(RAIL.legs[k])}</div>`; };
+    function railHtml(leg) {
+      const now = jstNow();
+      const isDay = now.date === leg.date;
+      const next = isDay ? leg.deps.find((t) => toMin(t) >= now.min) : null;
+      const deps = leg.deps.map((t) => `<span class="${isDay && toMin(t) < now.min ? 'gone' : t === next ? 'nx' : ''}">${t}</span>`).join('');
+      const nb = next ? `<div class="rn">다음 열차 ${next} · ${inText(toMin(next) - now.min)} → ${leg.to} ${hhmm(toMin(next) + leg.mins)} 도착</div>`
+        : isDay ? '<div class="rn">표에 있는 시간이 지났어요 · 역 안내판을 보세요</div>' : '';
+      return `<div class="rh">🚝 ${esc(leg.from)} → ${esc(leg.to)} · 약 ${leg.mins}분${leg.fare ? ` · 어른 ¥${leg.fare}` : ''} ${stBadge(RAIL.st)}</div>`
+        + `${nb}<div class="deps">${deps}</div><div class="rs">${esc(RAIL.stNote)} · 첫차 ${RAIL.first} · 막차 ${RAIL.last} (공항 출발)</div>`;
     }
 
     function busHtml() {
       const now = jstNow();
       const isDay = now.date === BUS.date;
       const legs = BUS.legs.map((leg) => {
-        const next = isDay ? leg.rows.find((r) => toMin(r[0]) >= now.min) : null;
+        const next = isDay ? leg.rows.find((r) => toMin(r[0]) >= now.min && !(leg.last && toMin(r[0]) > toMin(leg.last))) : null;
         const rows = leg.rows.map((r) => {
-          const cls = [r[0] === leg.base ? 'base' : '', r[0] === leg.last ? 'last' : '', isDay && toMin(r[0]) < now.min ? 'gone' : ''].join(' ');
-          const lab = r[0] === leg.base ? '<span class="lab">기본</span>' : r[0] === leg.last ? '<span class="lab">마지노선</span>' : '';
+          const over = leg.last && toMin(r[0]) > toMin(leg.last); // 마지노선 뒤 버스는 비행기 시간 때문에 타지 않는다
+          const cls = [r[0] === leg.base ? 'base' : '', r[0] === leg.last ? 'last' : '', over ? 'over' : '',
+            isDay && toMin(r[0]) < now.min ? 'gone' : ''].join(' ');
+          const lab = r[0] === leg.base ? '<span class="lab">기본</span>' : r[0] === leg.last ? '<span class="lab">마지노선</span>'
+            : over ? '<span class="lab">타지 않기</span>' : '';
           return `<tr class="${cls}"><td>${r[0]} 출발</td><td>${r[1]} 도착</td><td class="r">${lab}</td></tr>`;
         }).join('');
         const nb = next ? `<div class="nextbus">다음 버스 ${next[0]} · ${toMin(next[0]) - now.min}분 남음</div>` : '';
@@ -380,25 +468,79 @@
     function renderDay() {
       const d = DAYS[dayIdx];
       const isToday = jstNow().date === d.date;
-      const plans = (d.plans || []).map((x) => `<div class="card plan"><b>${esc(x.title)}</b><p>${esc(x.t)}</p></div>`).join('');
+      const plans = (d.plans || []).map((x) => `<details class="card plan"><summary>${esc(x.title)}</summary><p>${esc(x.t)}</p></details>`).join('');
       $('#day').innerHTML = `
+        <div id="nowbox"></div>
         <div class="dayhead"><h2>${esc(d.title)}</h2>
           ${d.strict ? '<span class="strict">시간 엄수</span>' : ''}${isToday ? '<button class="jump" data-jump>지금 위치로</button>' : ''}</div>
+        <div class="glance" id="glance"></div>
         <div class="card tl" style="padding:2px 0 2px 0">${d.steps.map((s, i) => stepHtml(s, i, d)).join('')}</div>
-        ${plans}
+        ${plans ? `<h2>플랜 B <span class="small">눌러서 펼치기</span></h2>${plans}` : ''}
         ${d.n === 3 ? '<div id="bus">' + busHtml() + '</div>' : ''}
         <h2>주의</h2><div class="card"><ul class="notes">${d.warn.map(noteLi).join('')}</ul></div>`;
       markNow();
     }
 
     // 오늘 일정이면 지나간 칸은 흐리게, 지금 칸은 강조한다. 시각이 없는 칸(식후·밤)은 앞 칸의 시각을 따른다.
+    // 칸마다 시각(분). 시각이 없는 칸은 앞 칸의 시각을 따른다.
+    const stepMins = (d) => { let last = 0; return d.steps.map((s) => (last = toMin(s.t) ?? last)); };
+    // 그날의 지금 칸 번호. 그날이 아니면 -1, 첫 칸 전이면 -1.
+    function curIdx(d, now) {
+      if (now.date !== d.date) return -1;
+      let cur = -1;
+      stepMins(d).forEach((m, i) => { if (m <= now.min) cur = i; });
+      return cur;
+    }
+    const stepTitle = (s) => { const p = s.at ? place(s.at) : null; return (p ? p.name : s.name).replace(/\s*\(.*$/, ''); };
+    const inText = (m) => (m >= 60 ? `${Math.floor(m / 60)}시간 ${m % 60}분 후` : `${m}분 후`);
+    // 지금·다음 카드: 여행 중에는 오늘 칸, 출발 전에는 첫 일정까지 남은 시간.
+    function nowHtml(d, now) {
+      const first = DAYS[0];
+      if (now.date < first.date && dayIdx === 0) {
+        const m = dayDiff(now.date, first.date) * 1440 + toMin(first.steps[0].t) - now.min;
+        const s0 = first.steps[0];
+        return `<div class="card nowcard"><div class="lbl">출발 전 · 첫 일정</div><div class="cur">${s0.t} ${esc(stepTitle(s0))} · ${esc(s0.do)}</div>`
+          + `<div class="sub">${+first.date.slice(5, 7)}/${+first.date.slice(8)}(${first.dow}) <span class="in">${inText(m)}</span></div></div>`;
+      }
+      if (now.date !== d.date) return '';
+      const mins = stepMins(d);
+      const cur = curIdx(d, now);
+      const nxt = d.steps[cur + 1];
+      const curTxt = cur < 0 ? '하루 시작 전' : `${esc(stepTitle(d.steps[cur]))}`;
+      const curSub = cur < 0 ? '' : `<div class="sub">${esc(d.steps[cur].do)}</div>`;
+      const nm = nxt ? toMin(nxt.t) : null;
+      const left = nm !== null ? nm - now.min : null;
+      const nxHtml = nxt ? `<div class="nx"><span class="lbl">다음</span> <b>${esc(nxt.t)} ${esc(stepTitle(nxt))}</b>`
+        + `${left !== null && left >= 0 ? `<span class="in ${left <= 15 ? 'soon' : ''}">${inText(left)}</span>` : ''}`
+        + `<div class="sub">${esc(nxt.do)}</div></div>` : '<div class="nx">오늘 일정 끝 · 수고하셨어요</div>';
+      const start = mins[0], end = Math.max(...mins);
+      const pct = Math.min(100, Math.max(0, ((now.min - start) / Math.max(1, end - start)) * 100));
+      return `<div class="card nowcard"><div class="lbl">지금 · 일본 ${now.hm}</div><div class="cur">${curTxt}</div>${curSub}${nxHtml}`
+        + `<div class="pbar"><i style="width:${pct}%"></i></div><div class="ends"><span>${d.steps[0].t}</span><span>${Math.round(pct)}%</span>`
+        + `<span>${d.steps[mins.indexOf(end)].t}</span></div></div>`;
+    }
+    // 한눈에 줄: 중요한 칸(key)과 지금 칸을 가로로.
+    function glanceHtml(d, cur) {
+      return d.steps.map((s, i) => (s.key || i === cur ? `<button class="${i < cur ? 'past' : i === cur ? 'now' : i === cur + 1 ? 'next' : ''}"`
+        + ` data-goto="${i}"><b>${esc(s.t)}</b><span>${esc(stepTitle(s))}</span></button>` : '')).join('');
+    }
+    // 지금 칸 강조·지난 칸 흐림·다음 칸 표시·카드와 한눈에 줄 갱신. 지금 칸의 대책은 펼친다.
     function markNow() {
       const d = DAYS[dayIdx];
       const now = jstNow();
       const steps = $$('#day .step');
-      let cur = -1, last = 0;
-      d.steps.forEach((s, i) => { last = toMin(s.t) ?? last; if (now.date === d.date && last <= now.min) cur = i; });
-      steps.forEach((el, i) => { el.classList.toggle('now', i === cur); el.classList.toggle('past', i < cur); });
+      const cur = curIdx(d, now);
+      steps.forEach((el, i) => {
+        const wasNow = el.classList.contains('now');
+        el.classList.toggle('now', i === cur); el.classList.toggle('past', i < cur); el.classList.toggle('next', cur >= 0 && i === cur + 1);
+        if (i === cur && !wasNow) { const pb = el.querySelector('details.pb'); if (pb) pb.open = true; }
+      });
+      if ($('#nowbox')) $('#nowbox').innerHTML = nowHtml(d, now);
+      $$('#day [data-rail]').forEach((el) => { el.innerHTML = railHtml(RAIL.legs[+el.dataset.rail]); });
+      if ($('#glance')) {
+        $('#glance').innerHTML = glanceHtml(d, cur);
+        $('#glance .now')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+      }
       return steps[cur];
     }
 
@@ -501,14 +643,68 @@
     let vocabQuiz = load('chura-vocab-quiz', true);
     const quizBar = () => `<div class="vbar"><button class="mini ${vocabQuiz ? 'fill' : ''}" data-quiz>외우기 모드 ${vocabQuiz ? '켜짐' : '꺼짐'}</button>`
       + `<span class="small">${vocabQuiz ? '가린 칸을 누르면 읽는 법·뜻이 보여요' : '단어를 누르면 크게 보여요'}</span></div>`;
-    // 타일 순서: 전체 · 회화 묶음 · 단어집 · 지명·역 · 긴급(잘못 누르지 않도록 맨 끝).
+    // ── 비행기 공부: 인터넷 없이 되는 가나 표·낱말 카드. 아는 카드는 이 휴대폰에 저장한다. ──
+    // 가나 표: 한 줄에 다섯 칸, 빈칸은 '·'. 가타카나는 히라가나 코드에 0x60을 더한 글자다.
+    const KANA_ROWS = [['あいうえお', '아 이 우 에 오'], ['かきくけこ', '카 키 쿠 케 코'], ['さしすせそ', '사 시 스 세 소'],
+      ['たちつてと', '타 치 츠 테 토'], ['なにぬねの', '나 니 누 네 노'], ['はひふへほ', '하 히 후 헤 호'], ['まみむめも', '마 미 무 메 모'],
+      ['や·ゆ·よ', '야 · 유 · 요'], ['らりるれろ', '라 리 루 레 로'], ['わ·を·ん', '와 · 오 · 응'], ['がぎぐげご', '가 기 구 게 고'],
+      ['ざじずぜぞ', '자 지 즈 제 조'], ['だぢづでど', '다 지 즈 데 도'], ['ばびぶべぼ', '바 비 부 베 보'], ['ぱぴぷぺぽ', '파 피 푸 페 포']];
+    const toKata = (s) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
+    const kanaItems = (kata) => KANA_ROWS.flatMap(([ks, ko]) => [...ks].map((k, i) => [k, ko.split(' ')[i]]))
+      .filter(([k]) => k !== '·').map(([k, ko]) => ({ ja: kata ? toKata(k) : k, ko, mean: '' }));
+    const vocabOf = (tab) => VOCAB.filter((w) => VOCAB_TABS[tab].sets.includes(w.g));
+    const DECKS = {
+      kh: { label: 'ひらがな', items: kanaItems(false) },
+      kk: { label: 'カタカナ', items: kanaItems(true) },
+      places: { label: '역·지명 한자', items: vocabOf('places') },
+      words: { label: '단어집', items: vocabOf('words') },
+      pay: { label: '계산대 문장', items: PH.filter((p) => p.g === 'pay') },
+      move: { label: '교통 문장', items: PH.filter((p) => p.g === 'move') },
+    };
+    // 비행 약 2시간 코스(사용자 요청 2026-11-23).
+    const COURSE = [['0:00~0:30', 'ひらがな 읽기', 'kh'], ['0:30~1:00', 'カタカナ 읽기 (메뉴·가게 이름)', 'kk'],
+      ['1:00~1:30', '역·지명 한자', 'places'], ['1:30~1:50', '단어집', 'words'], ['1:50~2:00', '계산대 문장', 'pay']];
+    const study = load('chura-study', { known: [] });
+    const known = new Set(study.known);
+    let deck = 'kh', queue = [], reveal = false, kanaKata = false;
+    const cardId = (d, it) => d + ':' + it.ja;
+    const knownCount = (d) => DECKS[d].items.filter((it) => known.has(cardId(d, it))).length;
+    function fillQueue() {
+      queue = DECKS[deck].items.filter((it) => !known.has(cardId(deck, it)));
+      for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
+      reveal = false;
+    }
+    function kanaTable() {
+      const cells = KANA_ROWS.flatMap(([ks, ko]) => [...ks].map((k, i) => (k === '·' ? '<span class="blank"></span>'
+        : `<span><b lang="ja">${kanaKata ? toKata(k) : k}</b><small>${ko.split(' ')[i]}</small></span>`))).join('');
+      return `<h3 class="ph-sec">🔤 가나 표<span>표지판 읽기의 기본</span></h3><div class="card"><div class="row" style="margin:0 0 8px">`
+        + `<button class="mini ${kanaKata ? '' : 'fill'}" data-kana="0">ひらがな</button><button class="mini ${kanaKata ? 'fill' : ''}" data-kana="1">カタカナ</button>`
+        + `</div><div class="kana" lang="ja">${cells}</div></div>`;
+    }
+    function studyHtml() {
+      const course = COURSE.map(([t, label, d]) => `<button class="${d === deck ? 'on' : ''}" data-deck="${d}"><i>${t}</i><b>${label}</b>`
+        + `<small>${knownCount(d)}/${DECKS[d].items.length}</small></button>`).join('');
+      const it = queue[0];
+      const total = DECKS[deck].items.length;
+      const card = it ? `<div class="cnt">${esc(DECKS[deck].label)} · 남은 카드 ${queue.length} · 알아요 ${knownCount(deck)}/${total}</div>`
+        + `<div class="fja ${[...it.ja].length > 6 ? 'long' : ''}" lang="ja">${esc(it.ja)}</div><div class="fko ${reveal ? '' : 'hide'}">${esc(it.ko)}</div>`
+        + `<div class="fmean ${reveal ? '' : 'hide'}">${esc(it.mean)}</div>`
+        + (reveal ? `<div class="actions"><button class="btn" data-fc="again">다시 볼래요</button><button class="btn fill" data-fc="ok">알아요 ✓</button></div>`
+          : '<div class="actions"><button class="btn fill" data-fc="show">읽는 법 보기</button></div>')
+        : `<div class="fja">🎉</div><div class="fko">${esc(DECKS[deck].label)} 다 외웠어요</div>`
+          + '<div class="actions"><button class="btn" data-fc="reset">처음부터 다시</button></div>';
+      return `<h3 class="ph-sec">✈️ 비행 2시간 코스<span>인터넷 없이 돼요 · 비행기 모드 전에 한 번 열어 두기</span></h3>`
+        + `<div class="card course">${course}</div><div class="card fc">${card}</div>${kanaTable()}`;
+    }
+    // 타일 순서: 전체 · 회화 묶음 · 공부 · 단어집 · 지명·역 · 긴급(잘못 누르지 않도록 맨 끝).
     const phTiles = () => [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS).filter(([k]) => k !== 'sos'),
-      ...Object.entries(VOCAB_TABS), ['sos', PH_GROUPS.sos]];
+      ['study', { icon: '✈️', label: '비행기 공부' }], ...Object.entries(VOCAB_TABS), ['sos', PH_GROUPS.sos]];
     function renderPhrases() {
       $('#ph-groups').innerHTML = phTiles().map(([k, v]) =>
         `<button class="${k === phGroup ? 'on' : ''} ${k === 'sos' ? 'sos' : ''}" data-g="${k}"><i>${v.icon}</i>${v.label}</button>`).join('');
       const tab = VOCAB_TABS[phGroup];
       $('#phrase-list').classList.toggle('vquiz', !!tab && vocabQuiz);
+      if (phGroup === 'study') { if (!queue.length) fillQueue(); $('#phrase-list').innerHTML = studyHtml(); return; }
       $('#phrase-list').innerHTML = tab ? quizBar() + tab.sets.map(vocabSection).join('')
         : (phGroup === 'all' ? Object.keys(PH_GROUPS) : [phGroup]).map(phSection).join('');
       $('#words').textContent = WORDS;
@@ -574,6 +770,16 @@
       $('#o-ja').textContent = item.ja; $('#o-ko').textContent = item.ko; $('#o-mean').textContent = item.mean;
       $('#overlay').hidden = false;
     }
+    function studyStep(act) {
+      if (act === 'show') reveal = true;
+      else if (act === 'reset') { DECKS[deck].items.forEach((it) => known.delete(cardId(deck, it))); fillQueue(); }
+      else {
+        const it = queue.shift();
+        if (act === 'ok') known.add(cardId(deck, it)); else queue.splice(Math.min(queue.length, 3), 0, it); // 모르면 3장 뒤에 다시
+        save('chura-study', { known: [...known] });
+        reveal = false;
+      }
+    }
     function copyText(text) {
       if (navigator.clipboard) return navigator.clipboard.writeText(text);
       const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
@@ -582,7 +788,7 @@
 
     document.addEventListener('click', (e) => {
       const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],'
-        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-close],#o-copy');
+        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-goto],[data-deck],[data-fc],[data-kana],[data-close],#o-copy');
       if (!t) return;
       const ds = t.dataset;
       if (ds.view) show(ds.view);
@@ -601,9 +807,13 @@
       else if (t.id === 'o-copy') copyText(shown.ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
       else if ('close' in ds) { if (e.target === t || e.target.closest('button')) $('#overlay').hidden = true; }
       else if (ds.ph) openPhrase(PH[+ds.ph]);
+      else if (ds.deck) { deck = ds.deck; fillQueue(); renderPhrases(); }
+      else if (ds.kana) { kanaKata = ds.kana === '1'; renderPhrases(); }
+      else if (ds.fc) { studyStep(ds.fc); renderPhrases(); }
       else if ('quiz' in ds) { vocabQuiz = !vocabQuiz; save('chura-vocab-quiz', vocabQuiz); renderPhrases(); }
       else if (ds.vw) { if (vocabQuiz) t.classList.toggle('open'); else openPhrase(VOCAB[+ds.vw]); }
       else if ('jump' in ds) markNow()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      else if ('goto' in ds) $(`#day .step[data-i="${ds.goto}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
     document.addEventListener('change', (e) => {
@@ -619,11 +829,13 @@
     dayIdx = initialDay();
     renderDays(); renderDay(); renderMiku(); renderFood(); renderPhrases(); renderInfo(); renderHeader();
     setInterval(renderHeader, 1000);
-    let lastMin = jstNow().min;
+    let lastMin = jstNow().min, lastDate = jstNow().date;
     setInterval(() => {
-      const m = jstNow().min;
+      const { min: m, date } = jstNow();
       if (m === lastMin) return;
-      lastMin = m; renderDays(); markNow();
+      lastMin = m;
+      if (date !== lastDate) { lastDate = date; dayIdx = initialDay(); renderDays(); renderDay(); return; }
+      renderDays(); markNow();
       if ($('#bus')) $('#bus').innerHTML = busHtml();
     }, 5000);
     if (jstNow().date === DAYS[dayIdx].date) setTimeout(() => markNow()?.scrollIntoView({ block: 'center' }), 50);

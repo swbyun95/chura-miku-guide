@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, VOCAB_SETS, VOCAB_TABS, VOCAB,
-  NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, HOURS, CHECKS } = require('../data.js');
+  NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, RAIL, HOURS, CHECKS } = require('../data.js');
 const { buildKml } = require('./build-kml.js');
 
 const errors = [];
@@ -114,6 +114,17 @@ for (const leg of BUS.legs) {
   if (leg.last) expect(leg.rows.some((r) => r[0] === leg.last), `마지노선 버스가 시간표에 없음: ${leg.last}`);
 }
 expect(BUS.tips.every((x) => ST.includes(x.st)) && ST.includes(BUS.st), '버스 안내 상태값 오류');
+// 유이레일: 구간마다 그날 일정에 같은 시각의 칸이 있고, 출발 시각이 오름차순이며, 역 이름이 역 목록(VOCAB rail)에 있다.
+const railNames = VOCAB.filter((w) => w.g === 'rail').map((w) => w.ja);
+expect(ST.includes(RAIL.st) && toMin(RAIL.first) !== null && toMin(RAIL.last) !== null, '유이레일 상태값·첫막차 오류');
+for (const leg of RAIL.legs) {
+  const day = DAYS.find((d) => d.date === leg.date);
+  expect(day && day.steps.some((s) => s.t === leg.stepT), `유이레일 구간의 일정 칸 없음: ${leg.date} ${leg.stepT}`);
+  const deps = leg.deps.map(toMin);
+  expect(deps.length && deps.every((m, i) => m !== null && (i === 0 || m > deps[i - 1])), `유이레일 시각 순서 오류: ${leg.from}`);
+  expect(railNames.includes(leg.from) && railNames.includes(leg.to), `유이레일 역 이름 오류: ${leg.from} → ${leg.to}`);
+  expect(leg.mins > 0 && (leg.fare === null || leg.fare > 0), `유이레일 소요시간·요금 오류: ${leg.from}`);
+}
 expect(HOURS.every((h) => h.length === 3 && h[0] && h[1]), '영업시간 표 형식 오류');
 expect(new Set(CHECKS.map((c) => c[0])).size === CHECKS.length, '당일 확인 id 중복');
 
