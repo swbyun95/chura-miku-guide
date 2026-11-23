@@ -227,6 +227,25 @@
     .ph-tiles button i { display: block; font-style: normal; font-size: 20px; margin-bottom: 1px; }
     .ph-tiles button.on { background: var(--teal); border-color: var(--teal); color: #fff; }
     .ph-tiles button.sos:not(.on) { background: var(--red-soft); border-color: #f3b4be; color: var(--red); font-weight: 700; }
+    .ph-search { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 6px 0 8px; margin: 0 0 4px; }
+    .ph-search input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 11px 14px; border: 1.5px solid var(--line);
+      border-radius: 12px; background: #fff; }
+    .ph-search input:focus { outline: none; border-color: var(--teal2); }
+    .themes { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-top: 8px; }
+    .themes button { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 11px; font-size: 13px; }
+    .themes button.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .theme-grid button { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 2px 7px; font-size: 12px; word-break: keep-all; }
+    .theme-grid button i { display: block; font-style: normal; font-size: 22px; }
+    .theme-grid button small { display: block; color: var(--muted); font-size: 10px; }
+    .phrase .peasy { margin-top: 6px; font-size: 13px; color: #92400e; background: #fffbeb; border-radius: 8px; padding: 3px 8px; width: fit-content; }
+    .phrase .peasy b { font-size: 15px; }
+    .phrase.short .pja { font-size: 24px; font-weight: 800; }
+    .cul { font-size: 14px; }
+    .cul .ct { font-weight: 800; font-size: 15px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+    .cul .cj { color: var(--teal); font-size: 13px; }
+    .cul p { margin: 4px 0 0; color: #334155; }
+    .found { font-size: 13px; color: var(--muted); margin: 6px 4px 0; }
     .ph-sec { font-size: 16px; margin: 20px 4px 8px; }
     .ph-sec span { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
     .sos-call { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -298,7 +317,9 @@
     </section>
 
     <section class="view" id="v-ja">
-      <h2>회화 <span class="small">문장을 누르면 화면 가득 크게 보여요</span></h2>
+      <h2>회화 <span class="small">문장을 누르면 화면 가득 크게 보여요 · 인터넷 없이 돼요</span></h2>
+      <div class="ph-search"><input type="search" id="ph-q" placeholder="검색: 쇼핑, 아파요, 택시, トイレ, 카드…" autocomplete="off" enterkeyhint="search">
+        <div class="themes" id="ph-themes"></div></div>
       <div class="ph-tiles" id="ph-groups"></div>
       <div id="phrase-list"></div>
       <p class="small" id="words"></p>
@@ -341,7 +362,8 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=10"></script>
+  <script src="data.js?v=11"></script>
+  <script src="dict.js?v=11"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -618,9 +640,67 @@
 
     // ── 회화 ──
     let phGroup = 'all';
+    // 문장 목록: data.js 회화(PH) 뒤에 사전 문장(DICT_PH)을 붙인다. data-ph·data-copy는 이 목록의 번호다.
+    const ALLPH = [...PH, ...DICT_PH];
+    const ALLW = [...VOCAB, ...DICT_W];
+    const easyOf = (ph) => ph.easy || EASY[ph.ja];
+    const easyLine = (ph) => { const e = easyOf(ph); return e ? `<div class="peasy">⚡ 짧게 <b lang="ja">${esc(e[0])}</b> ${esc(e[1])}</div>` : ''; };
     const phCard = (ph, i) => `<div class="card phrase ${ph.g === 'show' ? 'show' : ''}" data-ph="${i}">`
       + `<div class="pja" lang="ja">${esc(ph.ja)}</div><div class="pko">${esc(ph.ko)}</div>`
-      + `<div class="pmean">${esc(ph.mean)}</div><button class="mini copy" data-copy="${i}">복사</button></div>`;
+      + `<div class="pmean">${esc(ph.mean)}</div>${easyLine(ph)}<button class="mini copy" data-copy="${i}">복사</button></div>`;
+    // 짧은 말 카드: 짧은 일본어를 크게, 원래 문장 뜻을 아래에.
+    const shortCard = (ph, i) => { const e = easyOf(ph); return `<div class="card phrase short" data-easy="${i}"><div class="pja" lang="ja">${esc(e[0])}</div>`
+      + `<div class="pko">${esc(e[1])}</div><div class="pmean">${esc(ph.mean)}</div></div>`; };
+    const culCard = (c) => `<div class="card cul"><div class="ct">${esc(c.title)} ${stBadge(c.st)}</div>`
+      + `${c.ja ? `<div class="cj"><span lang="ja">${esc(c.ja)}</span>${c.ko ? ' · ' + esc(c.ko) : ''}</div>` : ''}<p>${esc(c.d)}</p></div>`;
+
+    // ── 검색·테마: 모두 이 휴대폰 안에서 찾는다(오프라인). ──
+    // 비교용 정리: 소문자, 가타카나→히라가나, 띄어쓰기·장음 표시·문장부호 제거.
+    const norm = (s) => String(s).normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
+      .replace(/[\s\-ー・·.,!?！？。、()（）~〜]/g, '');
+    const themeOfPh = (ph) => ph.t ? [ph.t] : PH_THEME[ph.ja] || Object.keys(THEMES).filter((k) => THEMES[k].groups.includes(ph.g));
+    const themeOfW = (w) => w.t ? [w.t] : Object.keys(THEMES).filter((k) => THEMES[k].sets.includes(w.g));
+    // 검색어가 테마 이름·별칭을 품거나(예: '쇼핑하고 싶어'), 테마 이름·별칭이 검색어를 품으면(2글자 이상) 그 테마다.
+    function themesFor(q) {
+      const n = norm(q);
+      if (!n) return [];
+      const parts = String(q).trim().split(/\s+/); // '카드 결제 방법'처럼 띄어 쓰면 낱말마다 테마를 찾는다
+      if (parts.length > 1) return [...new Set(parts.flatMap(themesFor))];
+      // 한 글자 별칭(약·방·길…)은 검색어 전체가 그 글자일 때만 건다. '예약'이 '아플 때'로 가지 않게.
+      return Object.keys(THEMES).filter((k) => [THEMES[k].label, ...THEMES[k].words].map(norm)
+        .some((w) => (w.length < 2 ? n === w : n.includes(w)) || (n.length >= 2 && w.includes(n))));
+    }
+    const hit = (n, ...xs) => xs.some((x) => x && norm(x).includes(n));
+    function findAll(q, onlyTheme) {
+      const n = norm(q);
+      const th = onlyTheme ? [onlyTheme] : themesFor(q);
+      const inTh = (ks) => ks.some((k) => th.includes(k));
+      const ph = ALLPH.map((p, i) => [p, i]).filter(([p]) => inTh(themeOfPh(p)) || (!onlyTheme && hit(n, p.ja, p.ko, p.mean, ...(easyOf(p) || []))));
+      const w = ALLW.map((x, i) => [x, i]).filter(([x]) => inTh(themeOfW(x)) || (!onlyTheme && hit(n, x.ja, x.ko, x.mean)));
+      const cul = CULTURE.filter((c) => th.includes(c.t) || (!onlyTheme && hit(n, c.title, c.ja, c.ko, c.d)));
+      return { th, ph, w, cul };
+    }
+    let phQuery = '', phTheme = '';
+    const themeChips = () => Object.entries(THEMES).map(([k, v]) =>
+      `<button class="${k === phTheme ? 'on' : ''}" data-th="${k}">${v.icon} ${esc(v.label)}</button>`).join('');
+    function resultsHtml(r, title) {
+      const total = r.ph.length + r.w.length + r.cul.length;
+      if (!total) return `<p class="found">'${esc(phQuery)}' 결과가 없어요. 다른 말로 찾거나 아래 테마를 눌러 보세요.</p>`;
+      const ths = r.th.map((k) => `${THEMES[k].icon} ${esc(THEMES[k].label)}`).join(' · ');
+      return `<p class="found">${title}${ths ? ` · 테마 ${ths}` : ''} · 문장 ${r.ph.length} · 단어 ${r.w.length}${r.cul.length ? ` · 알아 두기 ${r.cul.length}` : ''}</p>`
+        + (r.cul.length ? `<h3 class="ph-sec">📌 알아 두기</h3>${r.cul.map(culCard).join('')}` : '')
+        + (r.ph.length ? `<h3 class="ph-sec">💬 문장</h3>${r.ph.map(([p, i]) => phCard(p, i)).join('')}` : '')
+        + (r.w.length ? `<h3 class="ph-sec">📖 단어</h3><div class="card">${r.w.map(([x, i]) => vRow(x, i, 0)).join('')}</div>` : '');
+    }
+    // 테마 사전 첫 화면: 테마 격자.
+    const themeGrid = () => `<h3 class="ph-sec">📚 테마 사전<span>테마를 누르거나 위에서 검색하세요</span></h3><div class="theme-grid">`
+      + Object.entries(THEMES).map(([k, v]) => { const r = findAll('', k); return `<button data-th="${k}"><i>${v.icon}</i>${esc(v.label)}`
+        + `<small>${r.ph.length + r.w.length + r.cul.length}개</small></button>`; }).join('') + '</div>';
+    // 짧은 말 모음: 짧게 말하는 법이 있는 문장만, 테마 순서대로.
+    function shortHtml() {
+      const items = ALLPH.map((p, i) => [p, i]).filter(([p]) => easyOf(p) && p.g !== 'sos');
+      return `<h3 class="ph-sec">⚡ 짧은 말<span>단어 몇 개로 통하는 말 · 누르면 크게</span></h3>${items.map(([p, i]) => shortCard(p, i)).join('')}`;
+    }
     // 긴급 전화 버튼. tel: 주소는 하이픈을 뺀다.
     const emergencyHtml = () => `<div class="card sos-call">${EMERGENCY.map((x, i) =>
       `<a class="call ${i === EMERGENCY.length - 1 ? 'wide' : ''}" href="tel:${x.tel.replace(/-/g, '')}">${esc(x.tel)}`
@@ -639,6 +719,11 @@
       const rows = VOCAB.map((w, i) => (w.g === set ? vRow(w, i, set === 'rail' ? ++n : 0) : '')).join('');
       return `<h3 class="ph-sec">${v.label}<span>${esc(v.tip)}</span></h3><div class="card">${rows}</div>`;
     }
+    // 단어집 탭 뒤쪽: 사전 단어를 테마별로.
+    const dictWordSections = () => Object.entries(THEMES).map(([k, v]) => {
+      const rows = ALLW.map((w, i) => (w.t === k ? vRow(w, i, 0) : '')).join('');
+      return rows ? `<h3 class="ph-sec">${v.icon} ${esc(v.label)}<span>사전 단어</span></h3><div class="card">${rows}</div>` : '';
+    }).join('');
     // 단어집은 사용자 공부용(2026-11-23): 외우기 모드가 기본, 이 휴대폰에 켜짐·꺼짐을 저장한다.
     let vocabQuiz = load('chura-vocab-quiz', true);
     const quizBar = () => `<div class="vbar"><button class="mini ${vocabQuiz ? 'fill' : ''}" data-quiz>외우기 모드 ${vocabQuiz ? '켜짐' : '꺼짐'}</button>`
@@ -698,14 +783,22 @@
     }
     // 타일 순서: 전체 · 회화 묶음 · 공부 · 단어집 · 지명·역 · 긴급(잘못 누르지 않도록 맨 끝).
     const phTiles = () => [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS).filter(([k]) => k !== 'sos'),
+      ['dict', { icon: '📚', label: '테마 사전' }], ['short', { icon: '⚡', label: '짧은 말' }],
       ['study', { icon: '✈️', label: '비행기 공부' }], ...Object.entries(VOCAB_TABS), ['sos', PH_GROUPS.sos]];
     function renderPhrases() {
-      $('#ph-groups').innerHTML = phTiles().map(([k, v]) =>
-        `<button class="${k === phGroup ? 'on' : ''} ${k === 'sos' ? 'sos' : ''}" data-g="${k}"><i>${v.icon}</i>${v.label}</button>`).join('');
+      const searching = !!norm(phQuery);
+      $('#ph-groups').innerHTML = phTiles().map(([k, v]) => `<button class="${k === phGroup && !searching && !phTheme ? 'on' : ''}`
+        + ` ${k === 'sos' ? 'sos' : ''}" data-g="${k}"><i>${v.icon}</i>${v.label}</button>`).join('');
+      $('#ph-themes').innerHTML = themeChips();
       const tab = VOCAB_TABS[phGroup];
-      $('#phrase-list').classList.toggle('vquiz', !!tab && vocabQuiz);
+      $('#phrase-list').classList.toggle('vquiz', !!tab && vocabQuiz && !searching && !phTheme);
+      if (searching) { $('#phrase-list').innerHTML = resultsHtml(findAll(phQuery), `'${esc(phQuery)}' 찾기`); return; }
+      if (phTheme) {
+        $('#phrase-list').innerHTML = resultsHtml({ ...findAll('', phTheme), th: [] }, `${THEMES[phTheme].icon} ${esc(THEMES[phTheme].label)}`); return; }
+      if (phGroup === 'dict') { $('#phrase-list').innerHTML = themeGrid(); return; }
+      if (phGroup === 'short') { $('#phrase-list').innerHTML = shortHtml(); return; }
       if (phGroup === 'study') { if (!queue.length) fillQueue(); $('#phrase-list').innerHTML = studyHtml(); return; }
-      $('#phrase-list').innerHTML = tab ? quizBar() + tab.sets.map(vocabSection).join('')
+      $('#phrase-list').innerHTML = tab ? quizBar() + tab.sets.map(vocabSection).join('') + (phGroup === 'words' ? dictWordSections() : '')
         : (phGroup === 'all' ? Object.keys(PH_GROUPS) : [phGroup]).map(phSection).join('');
       $('#words').textContent = WORDS;
     }
@@ -788,7 +881,7 @@
 
     document.addEventListener('click', (e) => {
       const t = e.target.closest('[data-view],[data-day],[data-map],[data-mk],[data-f],[data-g],[data-goph],'
-        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-goto],[data-deck],[data-fc],[data-kana],[data-close],#o-copy');
+        + '[data-copy],[data-ph],[data-vw],[data-quiz],[data-jump],[data-goto],[data-deck],[data-fc],[data-kana],[data-th],[data-easy],[data-close],#o-copy');
       if (!t) return;
       const ds = t.dataset;
       if (ds.view) show(ds.view);
@@ -801,17 +894,19 @@
         renderTracks();
       }
       else if (ds.f) { filter = ds.f; renderFilters(); renderPlaces(); }
-      else if (ds.goph) { phGroup = ds.goph; renderPhrases(); show('v-ja'); }
-      else if (ds.g) { phGroup = ds.g; renderPhrases(); }
-      else if (ds.copy) copyText(PH[+ds.copy].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
+      else if (ds.goph) { phGroup = ds.goph; phTheme = ''; setQuery(''); show('v-ja'); }
+      else if (ds.g) { phGroup = ds.g; phTheme = ''; setQuery(''); }
+      else if (ds.th) { phTheme = phTheme === ds.th ? '' : ds.th; setQuery(''); $('#ph-q').scrollIntoView({ block: 'start' }); }
+      else if (ds.easy) { const p = ALLPH[+ds.easy]; const e = easyOf(p); openPhrase({ ja: e[0], ko: e[1], mean: `${p.mean} · 원래 문장: ${p.ja}` }); }
+      else if (ds.copy) copyText(ALLPH[+ds.copy].ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
       else if (t.id === 'o-copy') copyText(shown.ja).then(() => toast('복사했어요'), () => toast('복사하지 못했어요'));
       else if ('close' in ds) { if (e.target === t || e.target.closest('button')) $('#overlay').hidden = true; }
-      else if (ds.ph) openPhrase(PH[+ds.ph]);
+      else if (ds.ph) openPhrase(ALLPH[+ds.ph]);
       else if (ds.deck) { deck = ds.deck; fillQueue(); renderPhrases(); }
       else if (ds.kana) { kanaKata = ds.kana === '1'; renderPhrases(); }
       else if (ds.fc) { studyStep(ds.fc); renderPhrases(); }
       else if ('quiz' in ds) { vocabQuiz = !vocabQuiz; save('chura-vocab-quiz', vocabQuiz); renderPhrases(); }
-      else if (ds.vw) { if (vocabQuiz) t.classList.toggle('open'); else openPhrase(VOCAB[+ds.vw]); }
+      else if (ds.vw) { if (vocabQuiz && t.closest('.vquiz')) t.classList.toggle('open'); else openPhrase(ALLW[+ds.vw]); }
       else if ('jump' in ds) markNow()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       else if ('goto' in ds) $(`#day .step[data-i="${ds.goto}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -823,6 +918,9 @@
       save(KEYS.checks, [...checked]);
     });
     $('#priv-addr').addEventListener('change', (e) => { priv.addr = e.target.value.trim(); save(KEYS.priv, priv); renderDay(); });
+    // 검색: 칠 때마다 바로 찾는다. 검색을 시작하면 테마 선택은 푼다.
+    function setQuery(q) { phQuery = q; if ($('#ph-q').value !== q) $('#ph-q').value = q; renderPhrases(); }
+    $('#ph-q').addEventListener('input', (e) => { phTheme = ''; setQuery(e.target.value); });
     $('#priv-memo').addEventListener('input', (e) => { priv.memo = e.target.value; save(KEYS.priv, priv); });
 
     // ── 시작 ──

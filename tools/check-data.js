@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, VOCAB_SETS, VOCAB_TABS, VOCAB,
   NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, RAIL, HOURS, CHECKS } = require('../data.js');
+const { THEMES, DICT_PH, DICT_W, EASY, PH_THEME, CULTURE } = require('../dict.js');
 const { buildKml } = require('./build-kml.js');
 
 const errors = [];
@@ -125,13 +126,27 @@ for (const leg of RAIL.legs) {
   expect(railNames.includes(leg.from) && railNames.includes(leg.to), `유이레일 역 이름 오류: ${leg.from} → ${leg.to}`);
   expect(leg.mins > 0 && (leg.fare === null || leg.fare > 0), `유이레일 소요시간·요금 오류: ${leg.from}`);
 }
+// 여행 회화 사전(dict.js): 테마가 실제 묶음을 가리키고, 항목 필드가 있고, 일본어가 겹치지 않는다.
+for (const [k, v] of Object.entries(THEMES)) {
+  expect(v.icon && v.label && v.words.length, `테마 필드 누락: ${k}`);
+  expect(v.groups.every((g) => PH_GROUPS[g]) && v.sets.every((s) => VOCAB_SETS[s]), `테마의 묶음 이름 오류: ${k}`);
+}
+const easyOk = (e) => !e || (Array.isArray(e) && e.length === 2 && e[0] && e[1]);
+for (const x of DICT_PH) expect(THEMES[x.t] && x.ja && x.ko && x.mean && easyOk(x.easy), `사전 문장 오류: ${x.ja}`);
+for (const x of DICT_W) expect(THEMES[x.t] && x.ja && x.ko && x.mean, `사전 단어 오류: ${x.ja}`);
+for (const [ja, ts] of Object.entries(PH_THEME)) expect(PH.some((x) => x.ja === ja) && ts.every((k) => THEMES[k]), `테마 지정 문장 오류: ${ja}`);
+for (const [ja, e] of Object.entries(EASY)) expect(PH.some((x) => x.ja === ja) && easyOk(e), `짧은 말의 원래 문장 없음: ${ja}`);
+for (const c of CULTURE) expect(THEMES[c.t] && c.title && c.d && ST.includes(c.st), `알아 두기 오류: ${c.title}`);
+const dupOf = (xs) => xs.filter((x, i) => xs.indexOf(x) !== i);
+expect(!dupOf([...PH, ...DICT_PH].map((x) => x.ja)).length, `문장 중복: ${dupOf([...PH, ...DICT_PH].map((x) => x.ja))}`);
+expect(!dupOf([...VOCAB, ...DICT_W].map((x) => x.ja)).length, `단어 중복: ${dupOf([...VOCAB, ...DICT_W].map((x) => x.ja))}`);
 expect(HOURS.every((h) => h.length === 3 && h[0] && h[1]), '영업시간 표 형식 오류');
 expect(new Set(CHECKS.map((c) => c[0])).size === CHECKS.length, '당일 확인 id 중복');
 
 // 공개 사이트 개인정보: 전화번호·예약번호 꼴·항공편 번호·번지까지 쓴 숙소 동네 주소·한국 집 도로명 주소가 없어야 한다.
 const PRIVATE = [[/\+81|\b0\d{1,3}-\d{2,4}-\d{4}\b/, '전화번호'], [/\b(?=[A-Z0-9]{6}\b)(?=[A-Z]*\d)(?=\d*[A-Z])[A-Z0-9]{6}\b/, '예약번호 꼴'],
   [/\bTW\s?\d{3}\b/, '항공편 번호'], [/辻\d/, '숙소 동네 번지'], [/[가-힣]+로\s?\d+(?:번길)?\b/, '도로명 주소']];
-for (const f of ['data.js', 'index.html', 'sw.js', 'chura_miku_street_2026.kml']) {
+for (const f of ['data.js', 'dict.js', 'index.html', 'sw.js', 'chura_miku_street_2026.kml']) {
   const text = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
   for (const [re, label] of PRIVATE) expect(!re.test(text), `개인정보로 보이는 값(${label}): ${f} → ${(text.match(re) || [])[0]}`);
 }
@@ -141,6 +156,9 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const dataSrc = (html.match(/<script src="(data\.js\?v=\d+)"/) || [])[1];
 expect(dataSrc && fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8').includes(`'./${dataSrc}'`), 'sw.js의 data.js 주소가 index.html과 다름');
 
+// 사전 파일도 같은 버전으로 저장하는지
+const dictSrc = (html.match(/<script src="(dict\.js\?v=\d+)"/) || [])[1];
+expect(dictSrc && fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8').includes(`'./${dictSrc}'`), 'sw.js의 dict.js 주소가 index.html과 다름');
 // KML이 data.js와 같은지
 const kmlPath = path.join(__dirname, '..', 'chura_miku_street_2026.kml');
 expect(fs.existsSync(kmlPath) && fs.readFileSync(kmlPath, 'utf8') === buildKml(), 'KML이 data.js와 다름: node tools/build-kml.js 실행');
@@ -150,4 +168,5 @@ if (errors.length) {
   process.exit(1);
 }
 const stepCount = DAYS.reduce((n, d) => n + d.steps.length, 0);
-console.log(`통과: 미쿠 장소 ${P.length}, 일정 장소 ${SPOTS.length}, 일정 칸 ${stepCount}, 메뉴 ${MENU.length}, 굿즈 ${G.length}, 문장 ${PH.length}`);
+console.log(`통과: 미쿠 장소 ${P.length}, 일정 장소 ${SPOTS.length}, 일정 칸 ${stepCount}, 메뉴 ${MENU.length}, 굿즈 ${G.length}, 문장 ${PH.length},`
+  + ` 사전 문장 ${DICT_PH.length}·단어 ${DICT_W.length}·짧은 말 ${Object.keys(EASY).length}`);

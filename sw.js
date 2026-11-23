@@ -1,7 +1,7 @@
 // 오프라인용 서비스 워커: 먼저 인터넷에서 받고(최신 유지), 4초 안에 안 오거나 끊기면 저장본을 쓴다.
 // 같은 사이트 파일만 저장한다. Google 지도는 인터넷이 있어야 열린다.
-const CACHE = 'chura-guide-v10';
-const FILES = ['./', './index.html', './data.js?v=10', './icon.svg', './manifest.webmanifest'];
+const CACHE = 'chura-guide-v11';
+const FILES = ['./', './index.html', './data.js?v=11', './dict.js?v=11', './icon.svg', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
