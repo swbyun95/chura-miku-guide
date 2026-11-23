@@ -238,6 +238,15 @@
     .theme-grid button small { display: block; color: var(--muted); font-size: 10px; }
     .phrase .peasy { margin-top: 6px; font-size: 13px; color: #92400e; background: #fffbeb; border-radius: 8px; padding: 3px 8px; width: fit-content; }
     .phrase .peasy b { font-size: 15px; }
+    .scene { background: #fff; border: 1px solid var(--line); border-radius: 14px; margin: 0 0 8px; }
+    .scene > summary { list-style: none; cursor: pointer; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .scene > summary::-webkit-details-marker { display: none; }
+    .scene > summary i { font-style: normal; font-size: 22px; }
+    .scene > summary small { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12px; }
+    .scene > summary::after { content: '▾'; color: var(--muted); }
+    .scene[open] > summary::after { content: '▴'; }
+    .scene .scn-body { padding: 0 10px 6px; }
+    .scene .scn-step { font-size: 13px; color: var(--teal); margin: 6px 4px 6px; }
     .phrase .pfull { margin-top: 6px; font-size: 13px; }
     .phrase .pfull summary { color: var(--muted); cursor: pointer; width: fit-content; padding: 2px 0; }
     .phrase .pfull .pja2 { font-size: 15px; font-weight: 600; line-height: 1.45; margin-top: 4px; }
@@ -365,8 +374,8 @@
   </div>
 
   <!-- data.js를 고치면 v 숫자를 올리고 sw.js의 같은 주소도 바꾼다(검사가 확인). -->
-  <script src="data.js?v=16"></script>
-  <script src="dict.js?v=16"></script>
+  <script src="data.js?v=17"></script>
+  <script src="dict.js?v=17"></script>
   <script>
     const TAG_LABEL = { stamp: '스탬프', ar: 'AR', panel: '등신대 패널', menu: '콜라보 메뉴', shop: '굿즈' };
     const KIND = { stamp: '스탬프', novelty: '노벨티', panel: '패널', ar: 'AR' };
@@ -642,7 +651,7 @@
     }
 
     // ── 회화 ──
-    let phGroup = 'all';
+    let phGroup = 'trip'; // 기본은 내 일정 회화(사용자 요청 2026-11-24)
     // 문장 목록: data.js 회화(PH) 뒤에 사전 문장(DICT_PH)을 붙인다. data-ph·data-copy는 이 목록의 번호다.
     const ALLPH = [...PH, ...DICT_PH];
     const ALLW = [...VOCAB, ...DICT_W];
@@ -796,7 +805,18 @@
         + `<div class="card course">${course}</div><div class="card fc">${card}</div>${kanaTable()}`;
     }
     // 타일 순서: 전체 · 회화 묶음 · 공부 · 단어집 · 지명·역 · 긴급(잘못 누르지 않도록 맨 끝).
-    const phTiles = () => [['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS).filter(([k]) => k !== 'sos'),
+    // 장소별 회화(내 일정): 일차별로 장소를 접어 두고, 펼치면 들어갈 때 → 주문 → 결제 → 나올 때 순서로 보여 준다.
+    const phIndex = new Map(ALLPH.map((p, i) => [p.ja, i]));
+    const STEP_NO = ['①', '②', '③', '④', '⑤'];
+    function tripHtml() {
+      const today = DAYS.find((d) => d.date === jstNow().date)?.n;
+      return `<h3 class="ph-sec">📍 내 일정 회화<span>장소를 누르면 들어갈 때부터 나올 때까지 순서대로</span></h3>`
+        + DAYS.map((d) => `<h3 class="ph-sec">${d.n}일 차 · ${esc(d.title)}${d.n === today ? '<span>오늘</span>' : ''}</h3>`
+          + SCENES.filter((s) => s.day === d.n).map((s) => `<details class="scene"><summary><i>${s.icon}</i>${esc(s.label)}<small>${esc(s.time || '')}</small></summary>`
+            + `<div class="scn-body">${s.steps.map(([n, list], k) => `<div class="scn-step">${STEP_NO[k] || ''} ${esc(n)}</div>`
+              + list.map((ja) => phCard(ALLPH[phIndex.get(ja)], phIndex.get(ja))).join('')).join('')}</div></details>`).join('')).join('');
+    }
+    const phTiles = () => [['trip', { icon: '📍', label: '내 일정' }], ['all', { icon: '🗂', label: '전체' }], ...Object.entries(PH_GROUPS).filter(([k]) => k !== 'sos'),
       ['dict', { icon: '📚', label: '테마 사전' }], ['short', { icon: '⚡', label: '짧은 말' }],
       ['study', { icon: '✈️', label: '비행기 공부' }], ...Object.entries(VOCAB_TABS), ['sos', PH_GROUPS.sos]];
     function renderPhrases() {
@@ -809,6 +829,7 @@
       if (searching) { $('#phrase-list').innerHTML = resultsHtml(findAll(phQuery), `'${esc(phQuery)}' 찾기`); return; }
       if (phTheme) {
         $('#phrase-list').innerHTML = resultsHtml({ ...findAll('', phTheme), th: [] }, `${THEMES[phTheme].icon} ${esc(THEMES[phTheme].label)}`); return; }
+      if (phGroup === 'trip') { $('#phrase-list').innerHTML = tripHtml(); return; }
       if (phGroup === 'dict') { $('#phrase-list').innerHTML = themeGrid(); return; }
       if (phGroup === 'short') { $('#phrase-list').innerHTML = shortHtml(); return; }
       if (phGroup === 'study') { if (!queue.length) fillQueue(); $('#phrase-list').innerHTML = studyHtml(); return; }

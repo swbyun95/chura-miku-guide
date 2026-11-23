@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { CONFIG, P, MENU, G, GN, PH_GROUPS, EMERGENCY, PH, VOCAB_SETS, VOCAB_TABS, VOCAB,
   NOTICES, SOURCES, TRACK, SPOTS, DAYS, BUS, RAIL, HOURS, CHECKS } = require('../data.js');
-const { THEMES, DICT_PH, DICT_W, EASY, PH_THEME, CULTURE } = require('../dict.js');
+const { THEMES, DICT_PH, DICT_W, EASY, PH_THEME, CULTURE, SCENES } = require('../dict.js');
 const { buildKml } = require('./build-kml.js');
 
 const errors = [];
@@ -138,6 +138,14 @@ for (const x of DICT_PH) expect(THEMES[x.t] && x.ja && x.ko && x.mean && easyOk(
 for (const x of DICT_W) expect(THEMES[x.t] && x.ja && x.ko && x.mean, `사전 단어 오류: ${x.ja}`);
 for (const [ja, ts] of Object.entries(PH_THEME)) expect(PH.some((x) => x.ja === ja) && ts.every((k) => THEMES[k]), `테마 지정 문장 오류: ${ja}`);
 for (const [ja, e] of Object.entries(EASY)) expect(PH.some((x) => x.ja === ja) && easyOk(e), `짧은 말의 원래 문장 없음: ${ja}`);
+// 장소별 회화: 일차 1~3, 단계마다 문장이 있고, 모든 문장이 회화 목록에 있다.
+{ const phSet = new Set([...PH, ...DICT_PH].map((x) => x.ja));
+  expect(Array.isArray(SCENES) && SCENES.length >= 15, `장소별 회화가 너무 적음 (${SCENES?.length})`);
+  expect(new Set(SCENES.map((s) => s.id)).size === SCENES.length, '장소별 회화 id 중복');
+  for (const s of SCENES) {
+    expect([1, 2, 3].includes(s.day) && s.icon && s.label && s.steps.length, `장소별 회화 필드 오류: ${s.id}`);
+    for (const [n, list] of s.steps) for (const ja of list) expect(n && phSet.has(ja), `장소별 회화 문장 없음: ${s.id} · ${ja}`);
+  } }
 for (const c of CULTURE) expect(THEMES[c.t] && c.title && c.d && ST.includes(c.st), `알아 두기 오류: ${c.title}`);
 const dupOf = (xs) => xs.filter((x, i) => xs.indexOf(x) !== i);
 expect(!dupOf([...PH, ...DICT_PH].map((x) => x.ja)).length, `문장 중복: ${dupOf([...PH, ...DICT_PH].map((x) => x.ja))}`);
